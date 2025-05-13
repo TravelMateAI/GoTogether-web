@@ -1,3 +1,4 @@
+import { useSession } from "@/app/(main)/SessionProvider"; // ✅ Import session hook
 import kyInstance from "@/lib/ky";
 import { BookmarkInfo } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { Bookmark } from "lucide-react";
 import { useToast } from "../ui/use-toast";
+import { use } from "react";
 
 interface BookmarkButtonProps {
   postId: string;
@@ -20,27 +22,34 @@ export default function BookmarkButton({
   initialState,
 }: BookmarkButtonProps) {
   const { toast } = useToast();
-
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  
+  console.log("user : ",user);
 
   const queryKey: QueryKey = ["bookmark-info", postId];
 
   const { data } = useQuery({
     queryKey,
     queryFn: () =>
-      kyInstance.get(`/api/posts/${postId}/bookmark`).json<BookmarkInfo>(),
+      kyInstance
+        .get(`api/posts/${postId}/bookmark?userId=${user.userId}`)
+        .json<BookmarkInfo>(),
     initialData: initialState,
     staleTime: Infinity,
   });
 
+  console.log("Data : ",data);
+
   const { mutate } = useMutation({
     mutationFn: () =>
-      data.isBookmarkedByUser
-        ? kyInstance.delete(`/api/posts/${postId}/bookmark`)
-        : kyInstance.post(`/api/posts/${postId}/bookmark`),
+      data?.isBookmarkedByUser
+        ? kyInstance.delete(`api/posts/${postId}/bookmark?userId=${user.userId}`)
+        : kyInstance.post(`api/posts/${postId}/bookmark?userId=${user.userId}`),
+
     onMutate: async () => {
       toast({
-        description: `Post ${data.isBookmarkedByUser ? "un" : ""}bookmarked`,
+        description: `Post ${data?.isBookmarkedByUser ? "un" : ""}bookmarked`,
       });
 
       await queryClient.cancelQueries({ queryKey });
@@ -53,7 +62,8 @@ export default function BookmarkButton({
 
       return { previousState };
     },
-    onError(error, variables, context) {
+
+    onError(error, _vars, context) {
       queryClient.setQueryData(queryKey, context?.previousState);
       console.error(error);
       toast({
@@ -68,7 +78,8 @@ export default function BookmarkButton({
       <Bookmark
         className={cn(
           "size-5",
-          data.isBookmarkedByUser && "fill-primary text-primary",
+          data.isBookmarkedByUser && 
+          "fill-primary text-primary"
         )}
       />
     </button>

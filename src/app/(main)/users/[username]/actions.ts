@@ -1,24 +1,26 @@
 "use server";
 
-import { validateRequest } from "@/auth";
+import kyInstance from "@/lib/ky";
+import { validateRequestServer } from "@/auth";
 import { updateUserProfileSchema, UpdateUserProfileValues } from "@/lib/validation";
 
-export async function updateUserProfile(values: UpdateUserProfileValues) {
-  const validatedValues = updateUserProfileSchema.parse(values);
+import { UserData } from "@/lib/types"; // or wherever your User type is
 
-  const { user, token } = await validateRequest();
-  if (!user || !token) throw new Error("Unauthorized");
+export async function updateUserProfile(
+  values: UpdateUserProfileValues & { avatarUrl?: string }
+): Promise<UserData> { 
+  const { user } = await validateRequestServer();
+  if (!user) throw new Error("Unauthorized");
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${user.id}/profile`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Optional, for future auth
+  const res = await kyInstance.put(`api/users/${user.userId}/profile`, {
+    json: {
+      displayName: values.displayName,
+      bio: values.bio,
+      avatarUrl: values.avatarUrl,
     },
-    body: JSON.stringify(validatedValues),
   });
 
-  if (!res.ok) throw new Error("Failed to update user profile");
+  if (!res.ok) throw new Error("Profile update failed");
 
-  return await res.json();
+  return await res.json(); // This will now be typed as UserData
 }

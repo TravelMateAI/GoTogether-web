@@ -43,7 +43,8 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const { user } = useSession();
   const [showComments, setShowComments] = useState(false);
-  // console.log("Post1 :",post);
+  console.log("Post1 :",post);
+
 
   return (
     <article className="group/post space-y-3 rounded-2xl bg-card p-5 shadow-sm">
@@ -100,7 +101,7 @@ export default function Post({ post }: PostProps) {
           postId={post.postId}
           initialState={{
             isBookmarkedByUser:
-              post.bookmarks?.some((b) => b.userId === user.id) ?? false,
+              post.bookmarks?.some((b) => b.userId === user.userId) ?? false,
           }}
         />
       </div>

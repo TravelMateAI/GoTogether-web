@@ -54,30 +54,30 @@ export function useUpdateProfileMutation() {
 
       await queryClient.cancelQueries(queryFilter);
 
-      queryClient.setQueriesData<InfiniteData<PostsPage, string | null>>(
-        queryFilter,
-        (oldData) => {
-          if (!oldData) return;
+      // queryClient.setQueriesData<InfiniteData<PostsPage, string | null>>(
+      //   queryFilter,
+      //   (oldData) => {
+      //     if (!oldData) return;
 
-          return {
-            pageParams: oldData.pageParams,
-            pages: oldData.pages.map((page) => ({
-              nextCursor: page.nextCursor,
-              posts: page.posts.map((post) => {
-                if (post.user.id === updatedUser.id) {
-                  return {
-                    ...post,
-                    user: {
-                      ...updatedUser,
-                    },
-                  };
-                }
-                return post;
-              }),
-            })),
-          };
-        },
-      );
+      //     return {
+      //       pageParams: oldData.pageParams,
+      //       pages: oldData.pages.map((page) => ({
+      //         nextCursor: page.nextCursor,
+      //         posts: (page.posts ?? []).map((post) => {
+      //           if (post.user.id === updatedUser.id) {
+      //             return {
+      //               ...post,
+      //               user: {
+      //                 ...updatedUser,
+      //               },
+      //             };
+      //           }
+      //           return post;
+      //         }),
+      //       })),            
+      //     };
+      //   },
+      // );
 
       router.refresh();
 
@@ -87,7 +87,7 @@ export function useUpdateProfileMutation() {
     },
 
     onError(error) {
-      console.error(error);
+      console.error("error",error);
       toast({
         variant: "destructive",
         description: "Failed to update profile. Please try again.",

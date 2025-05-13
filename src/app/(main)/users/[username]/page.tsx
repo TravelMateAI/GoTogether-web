@@ -74,7 +74,7 @@ export async function generateMetadata({ params: { username } }: PageProps): Pro
 export default async function Page({ params: { username } }: PageProps) {
   const { user: loggedInUser } = await validateRequestServer();
 
-  // console.log(loggedInUser);
+  console.log("Logged User : ",loggedInUser);
 
   if (!loggedInUser) {
     return (
@@ -84,12 +84,12 @@ export default async function Page({ params: { username } }: PageProps) {
     );
   }
 
-  const user = await getUser(username, loggedInUser.id);
-
+  const user = await getUser(username, loggedInUser.userId);
+  console.log("User : ",user);
   return (
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-5">
-        <UserProfile user={user} loggedInUserId={loggedInUser.id} />
+        <UserProfile user={user} loggedInUserId={loggedInUser.userId} />
         <div className="rounded-2xl bg-card p-5 shadow-sm">
           <h2 className="text-center text-2xl font-bold">
             {user.displayName}&apos;s posts
@@ -114,6 +114,9 @@ function UserProfile({ user, loggedInUserId }: UserProfileProps) {
       (f: { followerId: string }) => f.followerId === loggedInUserId,
     ),    
   };
+
+  console.log("User Id :",user.id);
+  console.log("Logged user id",loggedInUserId);
 
   return (
     <div className="h-fit w-full space-y-5 rounded-2xl bg-card p-5 shadow-sm">
