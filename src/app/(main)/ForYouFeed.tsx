@@ -57,11 +57,11 @@ export default function ForYouFeed() {
   });
   
   
-  console.log(data);
+  // console.log(data);
 
   // ✅ FIX: explicitly tell TypeScript this is an array of pages
   const posts: Post[] = data?.pages?.flatMap((page) => page.posts) ?? [];
-  console.log(posts);
+  // console.log(posts);
 
   if (status === "pending") return <PostsLoadingSkeleton />;
 

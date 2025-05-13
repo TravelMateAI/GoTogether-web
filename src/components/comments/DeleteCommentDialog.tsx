@@ -41,13 +41,14 @@ export default function DeleteCommentDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <LoadingButton
-            variant="destructive"
-            onClick={() => mutation.mutate(comment.id, { onSuccess: onClose })}
-            loading={mutation.isPending}
-          >
-            Delete
-          </LoadingButton>
+        <LoadingButton
+          variant="destructive"
+          onClick={() => mutation.mutate(comment.commentId, { onSuccess: onClose })}
+          loading={mutation.isPending}
+        >
+          Delete
+        </LoadingButton>
+
           <Button
             variant="outline"
             onClick={onClose}

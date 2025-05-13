@@ -43,6 +43,7 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const { user } = useSession();
   const [showComments, setShowComments] = useState(false);
+  // console.log("Post1 :",post);
 
   return (
     <article className="group/post space-y-3 rounded-2xl bg-card p-5 shadow-sm">
@@ -163,6 +164,7 @@ interface CommentButtonProps {
 }
 
 function CommentButton({ post, onClick }: CommentButtonProps) {
+  // console.log("Post 2 :",post);
   return (
     <button onClick={onClick} className="flex items-center gap-2">
       <MessageSquare className="size-5" />

@@ -1,9 +1,10 @@
 "use server";
 
-import { validateRequest } from "@/auth";
-import prisma from "@/lib/prisma";
-import { getCommentDataInclude, PostData } from "@/lib/types";
+import { validateRequestServer } from "@/auth";
+import kyInstance from "@/lib/ky";
+import { CommentData, PostData } from "@/lib/types";
 import { createCommentSchema } from "@/lib/validation";
+
 
 export async function submitComment({
   post,
@@ -11,56 +12,47 @@ export async function submitComment({
 }: {
   post: PostData;
   content: string;
-}) {
-  const { user } = await validateRequest();
+}): Promise<CommentData> {
+  const { user } = await validateRequestServer();
 
   if (!user) throw new Error("Unauthorized");
 
   const { content: contentValidated } = createCommentSchema.parse({ content });
 
-  const [newComment] = await prisma.$transaction([
-    prisma.comment.create({
-      data: {
-        content: contentValidated,
-        postId: post.id,
-        userId: user.id,
-      },
-      include: getCommentDataInclude(user.id),
-    }),
-    ...(post.user.id !== user.id
-      ? [
-          prisma.notification.create({
-            data: {
-              issuerId: user.id,
-              recipientId: post.user.id,
-              postId: post.id,
-              type: "COMMENT",
-            },
-          }),
-        ]
-      : []),
-  ]);
+  const response = await kyInstance.post(`api/posts/${post.postId}/comment`, {
+    json: {
+      userId: user.id,
+      content: contentValidated,
+    },
+  });
 
-  return newComment;
+  if (!response.ok) {
+    throw new Error("Failed to post comment");
+  }
+
+  const createdComment: CommentData = await response.json();
+  return createdComment;
 }
 
-export async function deleteComment(id: string) {
-  const { user } = await validateRequest();
+
+export async function deleteComment(commentId: string) {
+  const { user } = await validateRequestServer();
+
+  console.log("comment id :",commentId);
 
   if (!user) throw new Error("Unauthorized");
 
-  const comment = await prisma.comment.findUnique({
-    where: { id },
+  const response = await kyInstance.delete(`api/posts/comments/${commentId}`, {
+    searchParams: { userId: user.userId }, // 👈 must match what Spring expects
   });
 
-  if (!comment) throw new Error("Comment not found");
+  if (!response.ok) {
+    throw new Error("Failed to delete comment");
+  }
 
-  if (comment.userId !== user.id) throw new Error("Unauthorized");
-
-  const deletedComment = await prisma.comment.delete({
-    where: { id },
-    include: getCommentDataInclude(user.id),
-  });
-
-  return deletedComment;
+  return {
+    success: true,
+    id: commentId,
+    postId: response.headers.get("X-Post-Id") ?? "", // optional
+  };
 }

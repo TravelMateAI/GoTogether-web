@@ -1,35 +1,60 @@
 import kyInstance from "@/lib/ky";
-import { CommentsPage, PostData } from "@/lib/types";
+import { PostData } from "@/lib/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import Comment from "./Comment";
 import CommentInput from "./CommentInput";
+import { CommentData } from "@/lib/types";
+
+// export interface CommentDTO {
+//   id: string;
+//   content: string;
+//   createdAt: string;
+//   postId: string;
+//   user: UserData;
+// }
+
+interface PageResponse {
+  comments: CommentData[];
+  hasNext: boolean;
+  nextPage: number;
+}
 
 interface CommentsProps {
   post: PostData;
 }
 
 export default function Comments({ post }: CommentsProps) {
-  const { data, fetchNextPage, hasNextPage, isFetching, status } =
-    useInfiniteQuery({
-      queryKey: ["comments", post.id],
-      queryFn: ({ pageParam }) =>
-        kyInstance
-          .get(
-            `/api/posts/${post.id}/comments`,
-            pageParam ? { searchParams: { cursor: pageParam } } : {},
-          )
-          .json<CommentsPage>(),
-      initialPageParam: null as string | null,
-      getNextPageParam: (firstPage) => firstPage.previousCursor,
-      select: (data) => ({
-        pages: [...data.pages].reverse(),
-        pageParams: [...data.pageParams].reverse(),
-      }),
-    });
+  // console.log("Post 3 :",post);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    status,
+    error,
+  } = useInfiniteQuery({
+    queryKey: ["comments", post.postId],
+    queryFn: async ({ pageParam = 0 }) => {
+      return kyInstance
+        .get(`api/posts/${post.postId}/comments`, {
+          searchParams: { page: pageParam, size: 5 },
+        })
+        .json<PageResponse>();
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextPage : undefined,
+  });
+  // console.log(error);
 
-  const comments = data?.pages.flatMap((page) => page.comments) || [];
+  // console.log("Data : ",data);
+
+  const comments =
+    data?.pages.flatMap((page) => page.comments) || [];
+
+    // console.log("Comments : ",comments);
 
   return (
     <div className="space-y-3">
@@ -55,7 +80,7 @@ export default function Comments({ post }: CommentsProps) {
       )}
       <div className="divide-y">
         {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <Comment key={comment.commentId} comment={comment} />
         ))}
       </div>
     </div>

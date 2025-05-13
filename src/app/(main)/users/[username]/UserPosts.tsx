@@ -36,7 +36,7 @@ export default function UserPosts({ userId }: UserPostsProps) {
 
   console.log("User id : {}",userId);
 
-  console.log(data);
+  // console.log(data);
 
   const posts = data?.pages.flatMap((page) => Array.isArray(page) ? page : [page]).flat() || [];
 

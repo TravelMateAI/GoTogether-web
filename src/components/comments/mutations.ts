@@ -1,4 +1,4 @@
-import { CommentsPage } from "@/lib/types";
+import { CommentsPage, CommentData } from "@/lib/types";
 import {
   InfiniteData,
   QueryKey,
@@ -10,12 +10,11 @@ import { deleteComment, submitComment } from "./actions";
 
 export function useSubmitCommentMutation(postId: string) {
   const { toast } = useToast();
-
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: submitComment,
-    onSuccess: async (newComment) => {
+    onSuccess: async (newComment: CommentData) => {
       const queryKey: QueryKey = ["comments", postId];
 
       await queryClient.cancelQueries({ queryKey });
@@ -23,33 +22,23 @@ export function useSubmitCommentMutation(postId: string) {
       queryClient.setQueryData<InfiniteData<CommentsPage, string | null>>(
         queryKey,
         (oldData) => {
-          const firstPage = oldData?.pages[0];
+          if (!oldData) return;
 
-          if (firstPage) {
-            return {
-              pageParams: oldData.pageParams,
-              pages: [
-                {
-                  previousCursor: firstPage.previousCursor,
-                  comments: [...firstPage.comments, newComment],
-                },
-                ...oldData.pages.slice(1),
-              ],
-            };
-          }
-        },
+          const firstPage = oldData.pages[0];
+          return {
+            pageParams: oldData.pageParams,
+            pages: [
+              {
+                previousCursor: firstPage.previousCursor,
+                comments: [...firstPage.comments, newComment],
+              },
+              ...oldData.pages.slice(1),
+            ],
+          };
+        }
       );
 
-      queryClient.invalidateQueries({
-        queryKey,
-        predicate(query) {
-          return !query.state.data;
-        },
-      });
-
-      toast({
-        description: "Comment created",
-      });
+      toast({ description: "Comment created" });
     },
     onError(error) {
       console.error(error);
@@ -59,19 +48,22 @@ export function useSubmitCommentMutation(postId: string) {
       });
     },
   });
-
-  return mutation;
 }
 
 export function useDeleteCommentMutation() {
   const { toast } = useToast();
-
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: deleteComment,
-    onSuccess: async (deletedComment) => {
-      const queryKey: QueryKey = ["comments", deletedComment.postId];
+    onSuccess: async ({
+      id,
+      postId,
+    }: {
+      id: string;
+      postId: string;
+    }) => {
+      const queryKey: QueryKey = ["comments", postId];
 
       await queryClient.cancelQueries({ queryKey });
 
@@ -84,15 +76,13 @@ export function useDeleteCommentMutation() {
             pageParams: oldData.pageParams,
             pages: oldData.pages.map((page) => ({
               previousCursor: page.previousCursor,
-              comments: page.comments.filter((c) => c.id !== deletedComment.id),
+              comments: page.comments.filter((c) => c.commentId !== id),
             })),
           };
-        },
+        }
       );
 
-      toast({
-        description: "Comment deleted",
-      });
+      toast({ description: "Comment deleted" });
     },
     onError(error) {
       console.error(error);
@@ -102,6 +92,4 @@ export function useDeleteCommentMutation() {
       });
     },
   });
-
-  return mutation;
 }

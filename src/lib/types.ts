@@ -55,7 +55,7 @@ export interface PostsPage {
 // ========== COMMENT ==========
 
 export interface CommentData {
-  id: string;
+  commentId: string;
   content: string;
   createdAt: string;
   postId: string;

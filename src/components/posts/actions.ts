@@ -1,26 +1,27 @@
 "use server";
+"use server";
 
-import { validateRequest } from "@/auth";
-import prisma from "@/lib/prisma";
-import { getPostDataInclude } from "@/lib/types";
+import { validateRequestServer } from "@/auth";
+import kyInstance from "@/lib/ky";
 
-export async function deletePost(id: string) {
-  const { user } = await validateRequest();
+/** Type for a deleted post */
+export interface DeletedPost {
+  postId: string;
+  message: string;
+}
+
+export async function deletePost(postId: string): Promise<DeletedPost> {
+  const { user } = await validateRequestServer();
 
   if (!user) throw new Error("Unauthorized");
 
-  const post = await prisma.post.findUnique({
-    where: { id },
+  const response = await kyInstance.delete(`api/posts/${postId}`, {
+    searchParams: { userId: user.userId },
   });
 
-  if (!post) throw new Error("Post not found");
+  if (!response.ok) {
+    throw new Error("Failed to delete post");
+  }
 
-  if (post.userId !== user.id) throw new Error("Unauthorized");
-
-  const deletedPost = await prisma.post.delete({
-    where: { id },
-    include: getPostDataInclude(user.id),
-  });
-
-  return deletedPost;
+  return await response.json();
 }

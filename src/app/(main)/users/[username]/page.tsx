@@ -33,7 +33,7 @@ const getUser = cache(async (username: string, viewerId: string): Promise<UserDa
     notFound();
   }
 
-  console.log(res);
+  // console.log(res);
 
   const user = await res.json();
 
@@ -74,7 +74,7 @@ export async function generateMetadata({ params: { username } }: PageProps): Pro
 export default async function Page({ params: { username } }: PageProps) {
   const { user: loggedInUser } = await validateRequestServer();
 
-  console.log(loggedInUser);
+  // console.log(loggedInUser);
 
   if (!loggedInUser) {
     return (

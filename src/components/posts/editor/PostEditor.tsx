@@ -24,7 +24,7 @@ interface PostEditorProps {
 
 export default function PostEditor({ postId, initialContent }: PostEditorProps) {
   const { user } = useSession();
-  console.log(user);
+  // console.log(user);
 
   const createMutation = useSubmitPostMutation();
   const updateMutation = useUpdatePostMutation();
@@ -52,7 +52,7 @@ export default function PostEditor({ postId, initialContent }: PostEditorProps) 
         placeholder: "What's on your mind?",
       }),
     ],
-    content: initialContent || "", // ✅ correct prop
+    content: initialContent || "", 
   });
   
 
@@ -62,9 +62,9 @@ export default function PostEditor({ postId, initialContent }: PostEditorProps) 
     }) || "";
 
   function onSubmit() {
-    console.log("submit");
-    console.log("user", user);
-    console.log("user.id", user?.userId);
+    // console.log("submit");
+    // console.log("user", user);
+    // console.log("user.id", user?.userId);
 
     console.log(input);
     if (!input.trim() || !user?.userId) return; 
