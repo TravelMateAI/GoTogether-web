@@ -37,7 +37,7 @@ export async function signUp(
     if (isRedirectError(error)) throw error;
     console.error(error);
     return {
-      error: "Something went wrong. Please try again.",
+      error: "Something3 went wrong. Please try again.",
     };
   }
 }

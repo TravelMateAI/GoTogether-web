@@ -6,10 +6,10 @@ import { FollowerInfo } from "@/lib/types";
 import { QueryKey, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
-import { ResponsePromise } from "ky"; // imported if using kyInstance
+import { useSession } from "@/app/(main)/SessionProvider";
 
 interface FollowButtonProps {
-  userId: string;
+  userId: string; // this is the target user ID (to be followed/unfollowed)
   initialState: FollowerInfo;
 }
 
@@ -20,40 +20,52 @@ export default function FollowButton({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const queryKey: QueryKey = ["follower-info", userId];
+  const { user } = useSession(); // logged-in user
+
+  // console.log("new user : ",user);
+
   const { data } = useFollowerInfo(userId, initialState);
 
+  console.log("data :",data);
+
   const { mutate, isPending } = useMutation<
-    Response, // return type from kyInstance (or use `ResponsePromise` if you prefer)
+    Response,
     Error,
     void,
     { previousState: FollowerInfo | undefined }
   >({
-    mutationFn: () =>
-      data?.isFollowedByUser
-        ? kyInstance.delete(`api/users/${userId}/followers`)
-        : kyInstance.post(`api/users/${userId}/followers`),
+    mutationFn: () => {
+      const followerUserId = user.userId;
+      const url = `api/users/${userId}/followers?followerUserId=${followerUserId}`;
+      console.log("[mutationFn] Request to:", url);
+
+      return data?.isFollowedByUser
+        ? kyInstance.delete(url)
+        : kyInstance.post(url);
+    },
 
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey });
-
       const previousState = queryClient.getQueryData<FollowerInfo>(queryKey);
 
-      queryClient.setQueryData<FollowerInfo>(queryKey, () => ({
+      const optimistic: FollowerInfo = {
         followers:
           (previousState?.followers || 0) +
           (previousState?.isFollowedByUser ? -1 : 1),
         isFollowedByUser: !previousState?.isFollowedByUser,
-      }));
+      };
+
+      queryClient.setQueryData<FollowerInfo>(queryKey, optimistic);
 
       return { previousState };
     },
 
     onError(error, _vars, context) {
+      console.error("[FollowButton] Mutation error:", error);
       queryClient.setQueryData(queryKey, context?.previousState);
-      console.error(error);
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: "Something1 went wrong. Please try again.",
       });
     },
   });

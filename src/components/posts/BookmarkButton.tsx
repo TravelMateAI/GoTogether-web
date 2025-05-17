@@ -68,7 +68,7 @@ export default function BookmarkButton({
       console.error(error);
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: "Something4 went wrong. Please try again.",
       });
     },
   });

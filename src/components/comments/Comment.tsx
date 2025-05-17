@@ -27,6 +27,9 @@ export default function Comment({ comment }: CommentProps) {
   const username = comment.user.username || "unknown";
   const displayName = comment.user.displayName || username;
 
+  console.log("comment user id: %s, user id: %s", comment.user.id, user.userId);
+
+
   return (
     <div className="group/comment flex items-start gap-3 py-3">
       {/* Avatar */}

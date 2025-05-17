@@ -74,7 +74,7 @@ export async function generateMetadata({ params: { username } }: PageProps): Pro
 export default async function Page({ params: { username } }: PageProps) {
   const { user: loggedInUser } = await validateRequestServer();
 
-  console.log("Logged User : ",loggedInUser);
+  // console.log("Logged User : ",loggedInUser);
 
   if (!loggedInUser) {
     return (

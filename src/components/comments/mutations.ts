@@ -41,7 +41,7 @@ export function useSubmitCommentMutation(postId: string) {
       toast({ description: "Comment created" });
     },
     onError(error) {
-      console.error(error);
+      console.error("comment Error :",error);
       toast({
         variant: "destructive",
         description: "Failed to submit comment. Please try again.",

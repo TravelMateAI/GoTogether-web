@@ -8,7 +8,14 @@ import { PostsPage } from "@/lib/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
+// Import your session/user context hook to get the logged-in user
+import { useSession } from "@/app/(main)/SessionProvider"; // Adjust path as needed
+// import { error } from "console";
+
 export default function Bookmarks() {
+  // Get the logged-in user (adjust as per your project)
+  const { user } = useSession();
+
   const {
     data,
     fetchNextPage,
@@ -16,17 +23,22 @@ export default function Bookmarks() {
     isFetching,
     isFetchingNextPage,
     status,
+    error,
   } = useInfiniteQuery({
-    queryKey: ["post-feed", "bookmarks"],
+    queryKey: ["post-feed", "bookmarks", user?.userId],
     queryFn: ({ pageParam }) =>
       kyInstance
-        .get(
-          "/api/posts/bookmarked",
-          pageParam ? { searchParams: { cursor: pageParam } } : {},
-        )
+        .get("api/posts/bookmarked", {
+          searchParams: {
+            userId: user?.userId, // Always include userId!
+            ...(pageParam ? { cursor: pageParam } : {}),
+            size: 10, // Optionally customize page size
+          },
+        })
         .json<PostsPage>(),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: !!user?.userId, // Only run query when user is available
   });
 
   const posts = data?.pages.flatMap((page) => page.posts) || [];
@@ -44,9 +56,10 @@ export default function Bookmarks() {
   }
 
   if (status === "error") {
+    console.log("Bookmark Error : ", error);
     return (
       <p className="text-center text-destructive">
-        An error occurred while loading bookmarks.
+        An error2 occurred while loading bookmarks.
       </p>
     );
   }
@@ -57,7 +70,7 @@ export default function Bookmarks() {
       onBottomReached={() => hasNextPage && !isFetching && fetchNextPage()}
     >
       {posts.map((post) => (
-        <Post key={post.id} post={post} />
+        <Post key={post.postId} post={post} />
       ))}
       {isFetchingNextPage && <Loader2 className="mx-auto my-3 animate-spin" />}
     </InfiniteScrollContainer>

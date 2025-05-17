@@ -53,7 +53,7 @@ export default function LikeButton({ postId, initialState }: LikeButtonProps) {
       console.error(error);
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: "Something5 went wrong. Please try again.",
       });
     },
   });

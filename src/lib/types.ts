@@ -26,6 +26,16 @@ export interface UserData {
   };
 }
 
+export interface ReactionData {
+  userId: string;
+  type: ReactionType;
+}
+
+export interface PostCountData {
+  reactionCounts: Record<ReactionType, number>;
+  comments: number;
+}
+
 export interface PostData {
   postId: string;
   caption: string | null;
@@ -37,12 +47,8 @@ export interface PostData {
     type: "IMAGE" | "VIDEO";
   }[];
   comments: any[];
-  reactionCounts: Record<string, number>;
-  reactions: { userId: string }[];
-  _count: {
-    likes: number;
-    comments: number;
-  };
+  reactions: ReactionData[];;
+  _count: PostCountData;
   bookmarks?: { userId: string }[];
 }
 

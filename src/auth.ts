@@ -65,3 +65,4 @@ export async function validateRequestFromCookie(rawCookie: string | undefined) {
     return { user: null, token: null };
   }
 }
+

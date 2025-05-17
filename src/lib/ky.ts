@@ -2,7 +2,7 @@
 import ky from "ky";
 
 const kyInstance = ky.create({
-  prefixUrl: "http://localhost:8080", // ✅ remove trailing slash
+  prefixUrl: "http://localhost:8080", 
   parseJson: (text) =>
     JSON.parse(text, (key, value) =>
       key.endsWith("At") && typeof value === "string" ? new Date(value) : value

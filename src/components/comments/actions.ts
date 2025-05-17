@@ -15,13 +15,15 @@ export async function submitComment({
 }): Promise<CommentData> {
   const { user } = await validateRequestServer();
 
+  console.log("Post User : ",user);
+
   if (!user) throw new Error("Unauthorized");
 
   const { content: contentValidated } = createCommentSchema.parse({ content });
 
   const response = await kyInstance.post(`api/posts/${post.postId}/comment`, {
     json: {
-      userId: user.id,
+      userId: user.userId,
       content: contentValidated,
     },
   });
@@ -29,6 +31,8 @@ export async function submitComment({
   if (!response.ok) {
     throw new Error("Failed to post comment");
   }
+
+  console.log("Resp :",response);
 
   const createdComment: CommentData = await response.json();
   return createdComment;

@@ -12,7 +12,9 @@ interface CommentInputProps {
 export default function CommentInput({ post }: CommentInputProps) {
   const [input, setInput] = useState("");
 
-  const mutation = useSubmitCommentMutation(post.id);
+  const mutation = useSubmitCommentMutation(post.postId);
+
+  console.log("Post id: ",post.postId);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
