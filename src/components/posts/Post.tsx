@@ -12,9 +12,9 @@ import UserAvatar from "../UserAvatar";
 import UserTooltip from "../UserTooltip";
 import BookmarkButton from "./BookmarkButton";
 import LikeButton from "./LikeButton";
-import ReactionButtonGroup from "./ReactionButtonGroup"
+import ReactionButtonGroup from "./ReactionButtonGroup";
 import PostMoreButton from "./PostMoreButton";
-import { FollowerInfo, UserData } from "@/lib/types";
+import { FollowerInfo, UserData, ReactionType } from "@/lib/types";
 
 export interface Post {
   postId: string;
@@ -28,7 +28,7 @@ export interface Post {
   }[];
   comments: any[];
   reactionCounts: Record<string, number>;
-  reactions: { userId: string }[];
+  reactions: { userId: string; type: ReactionType }[];
   _count: {
     likes: number;
     comments: number;
@@ -43,8 +43,11 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const { user } = useSession();
   const [showComments, setShowComments] = useState(false);
-  console.log("Post1 :",post);
-
+  console.log("Post1 :", post);
+  console.log("User :", user);
+  const userReaction = post.reactions.find(
+    (r) => r.userId === user.userId,
+  )?.type;
 
   return (
     <article className="group/post space-y-3 rounded-2xl bg-card p-5 shadow-sm">
@@ -70,7 +73,6 @@ export default function Post({ post }: PostProps) {
               suppressHydrationWarning
             >
               {formatRelativeDate(new Date(post.createdAt))}
-
             </Link>
           </div>
         </div>
@@ -90,7 +92,10 @@ export default function Post({ post }: PostProps) {
       <hr className="text-muted-foreground" />
       <div className="flex justify-between gap-5">
         <div className="flex items-center gap-5">
-        <ReactionButtonGroup postId={post.postId} />
+          <ReactionButtonGroup
+            postId={post.postId}
+            initialUserReaction={userReaction}
+          />
 
           <CommentButton
             post={post}
@@ -118,12 +123,16 @@ interface MediaPreviewProps {
   };
 }
 
-function MediaPreviews({ attachments }: { attachments: MediaPreviewProps["media"][] }) {
+function MediaPreviews({
+  attachments,
+}: {
+  attachments: MediaPreviewProps["media"][];
+}) {
   return (
     <div
       className={cn(
         "flex flex-col gap-3",
-        attachments.length > 1 && "sm:grid sm:grid-cols-2"
+        attachments.length > 1 && "sm:grid sm:grid-cols-2",
       )}
     >
       {attachments.map((m) => (

@@ -4,69 +4,42 @@ import { loginSchema, LoginValues } from "@/lib/validation";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const KEYCLOAK_BASE_URL = "http://localhost:8081/realms/kong";
-const KEYCLOAK_CLIENT_ID = "kong-oidc";
-const KEYCLOAK_CLIENT_SECRET = "fBHJFdikM0ERtTXnvebguHRz6iPUfJfV";
-
 export async function login(
-  credentials: LoginValues
+  credentials: LoginValues,
 ): Promise<{ error?: string } | void> {
   const { username, password } = loginSchema.parse(credentials);
 
-  // Step 1: Get token from Keycloak
-  const tokenRes = await fetch(`${KEYCLOAK_BASE_URL}/protocol/openid-connect/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+  console.debug("[login] Sending credentials to backend:", { username });
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Include cookies set by the backend
+      body: JSON.stringify({ username, password }),
     },
-    body: new URLSearchParams({
-      client_id: KEYCLOAK_CLIENT_ID,
-      client_secret: KEYCLOAK_CLIENT_SECRET,
-      grant_type: "password",
-      username,
-      password,
-      scope: "openid profile email",
-    }),
-  });
+  );
 
-  const tokenData = await tokenRes.json();
-
-  if (!tokenRes.ok || !tokenData.access_token) {
-    return {
-      error: tokenData.error_description || "Invalid username or password",
-    };
+  if (!res.ok) {
+    const error = await res.json();
+    console.warn("[login] Login failed:", error);
+    return { error: error.message || "Login failed" };
   }
 
-  const accessToken = tokenData.access_token;
+  const { accessToken, user: userDetails } = await res.json();
 
-  // Step 2: Fetch user info using the access token
-  const userinfoRes = await fetch(`${KEYCLOAK_BASE_URL}/protocol/openid-connect/userinfo`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+  console.debug("[login] Received access token and user details:", {
+    accessToken,
+    userDetails,
   });
 
-  if (!userinfoRes.ok) {
-    return {
-      error: "Failed to fetch user info from Keycloak",
-    };
+  if (!accessToken || !userDetails) {
+    console.error("[login] Invalid response from backend");
+    return { error: "Invalid login response" };
   }
-
-  const user = await userinfoRes.json();
-
-  const userDetailsRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/email/${user.email}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  
-  if (!userDetailsRes.ok) {
-    return {
-      error: "Failed to fetch user details from user service",
-    };
-  }
-  
-  const userDetails = await userDetailsRes.json();  
 
   // Step 3: Store access token and user info in cookies
   const cookieStore = cookies();
@@ -85,6 +58,6 @@ export async function login(
     maxAge: 3600,
   });
 
-  // Step 4: Redirect to home page
+  // ✅ Will throw NEXT_REDIRECT internally to trigger redirect
   redirect("/");
 }

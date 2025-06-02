@@ -5,9 +5,13 @@ import MenuBar from "./MenuBar";
 import Navbar from "./Navbar";
 import { redirect } from "next/navigation";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await getSession(); // ✨ Load session server-side
-  // console.log(session);
+  console.log(session);
   if (!session) {
     // No session, redirect to login
     return redirect("/login");

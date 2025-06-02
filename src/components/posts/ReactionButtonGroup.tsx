@@ -6,17 +6,9 @@ import { ReactionCounts, ReactionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../ui/use-toast";
-import {
-  Heart,
-  Laugh,
-  ThumbsUp,
-  Smile,
-  Frown,
-  Angry,
-} from "lucide-react";
+import { Heart, Laugh, ThumbsUp, Smile, Frown, Angry } from "lucide-react";
 import { useState, useRef } from "react";
 
-// Map icons to types
 const reactionIcons: {
   type: ReactionType;
   Icon: React.ElementType;
@@ -32,15 +24,18 @@ const reactionIcons: {
 
 interface Props {
   postId: string;
+  initialUserReaction?: ReactionType;
 }
 
-export default function ReactionButton({ postId }: Props) {
+export default function ReactionButton({ postId, initialUserReaction }: Props) {
   const { user } = useSession();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [showReactions, setShowReactions] = useState(false);
   const hideTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [selected, setSelected] = useState<ReactionType | null>(null);
+  const [selected, setSelected] = useState<ReactionType | null>(
+    initialUserReaction ?? null,
+  );
 
   const queryKey = ["reactions", postId];
 
@@ -75,64 +70,40 @@ export default function ReactionButton({ postId }: Props) {
     }, 300);
   };
 
-  const selectedReaction = reactionIcons.find(r => r.type === selected);
-
-  const totalReactions = Object.values(reactionData ?? {}).reduce(
-    (sum, count) => sum + (count || 0),
-    0
-  );
-
-  const summary = Object.entries(reactionData ?? {})
-    .filter(([_, count]) => count && count > 0)
-    .map(([type, count]) => {
-        const Icon = reactionIcons.find(r => r.type === type)?.Icon;
-        return Icon ? (
-          <span key={type} className="flex items-center gap-1">
-            <Icon className="size-4" /> {count}
-          </span>
-        ) : null;
-      });
-      
+  const selectedReaction = reactionIcons.find((r) => r.type === selected);
 
   return (
     <div
-      className="relative flex items-center gap-2"
+      className="relative flex flex-col items-start"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Reaction button */}
       <button
         onClick={() => mutation.mutate("LIKE")}
         className={cn(
-          "flex items-center gap-1 px-2 py-1 rounded-md transition-all",
-          selectedReaction?.color ?? "text-muted-foreground"
+          "flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium transition-all",
+          selectedReaction?.color ?? "text-muted-foreground",
         )}
       >
         {selectedReaction ? (
-          <>
-            <selectedReaction.Icon className="size-5" />
-            <span className="text-sm font-medium">{selectedReaction.type}</span>
-          </>
+          <selectedReaction.Icon className="size-5" />
         ) : (
-          <>
-            <ThumbsUp className="size-5 text-muted-foreground" />
-            <span className="text-sm font-medium">Like</span>
-          </>
+          <ThumbsUp className="size-5 text-muted-foreground" />
         )}
+        <span>{selectedReaction?.type ?? "Like"}</span>
       </button>
 
+      {/* Emoji popup */}
       {showReactions && (
-        <div
-          className="absolute -top-12 left-0 z-10 flex gap-2 rounded-full bg-white px-2 py-1 shadow-lg border"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+        <div className="absolute -top-14 left-0 z-10 flex gap-2 rounded-full border bg-white px-3 py-2 shadow-md">
           {reactionIcons.map(({ type, Icon, color }) => (
             <button
               key={type}
               onClick={() => mutation.mutate(type)}
               className={cn(
-                "p-1 hover:scale-125 transition-transform rounded-full",
-                color
+                "rounded-full p-1 transition hover:scale-125",
+                color,
               )}
               title={type}
             >
@@ -142,13 +113,20 @@ export default function ReactionButton({ postId }: Props) {
         </div>
       )}
 
-      {/* Summary below button */}
-      {/* {summary.length > 0 && (
-        <div className="ml-2 flex items-center gap-2 text-sm text-muted-foreground">
-          {summary}
-          {totalReactions > 0 && (
-            <span className="text-xs font-medium">({totalReactions})</span>
-          )}
+      {/* Reaction summary */}
+      {/* {reactionData && (
+        <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
+          {Object.entries(reactionData)
+            .filter(([_, count]) => count && count > 0)
+            .map(([type, count]) => {
+              const Icon = reactionIcons.find((r) => r.type === type)?.Icon;
+              return (
+                <span key={type} className="flex items-center gap-1">
+                  <Icon className="size-4" />
+                  {count}
+                </span>
+              );
+            })}
         </div>
       )} */}
     </div>

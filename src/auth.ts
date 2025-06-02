@@ -9,14 +9,61 @@ export async function getUserInfo(accessToken: string) {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
 
   if (!response.ok) throw new Error("Failed to fetch user info");
   return await response.json();
 }
 
+// Shared base64 decoder
+function decodeUser(encoded: string) {
+  try {
+    console.log("📦 Raw encoded user cookie:", JSON.stringify(encoded));
 
+    // 🔧 Fix: strip surrounding quotes if present
+    if (encoded.startsWith('"') && encoded.endsWith('"')) {
+      encoded = encoded.slice(1, -1);
+      console.log("🧹 Stripped quotes:", encoded);
+    }
+
+    console.log("🔎 Raw length:", encoded.length);
+
+    // Step 1: Replace URL-safe Base64 characters
+    let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+
+    // Step 2: Strip existing padding
+    const stripped = base64.replace(/=+$/, "");
+    console.log("🚫 After stripping padding:", stripped);
+
+    // Step 3: Add correct padding if needed
+    const paddingNeeded = 4 - (stripped.length % 4);
+    if (paddingNeeded < 4) {
+      base64 = stripped + "=".repeat(paddingNeeded);
+      console.log(
+        `➕ Added padding: ${"=".repeat(paddingNeeded)} (Final length: ${base64.length})`,
+      );
+    } else {
+      base64 = stripped;
+      console.log("✅ No padding needed");
+    }
+
+    console.log("🧪 Normalized base64 string:", base64);
+
+    // Step 4: Decode
+    const decoded = atob(base64);
+    console.log("✅ Decoded JSON string:", decoded);
+
+    const parsed = JSON.parse(decoded);
+    console.log("✅ Parsed user object:", parsed);
+
+    return parsed;
+  } catch (error) {
+    console.error("❌ Failed to decode user cookie:", error);
+    return null;
+  }
+}
+// 🔐 For server components (RSCs)
 export async function validateRequestServer() {
   const cookieStore = cookies();
   const rawUser = cookieStore.get("user")?.value;
@@ -24,45 +71,19 @@ export async function validateRequestServer() {
 
   if (!rawUser || !token) return { user: null, token: null };
 
-  try {
-    const user = JSON.parse(rawUser);
-    return { user, token };
-  } catch {
-    return { user: null, token: null };
-  }
+  const user = decodeUser(rawUser);
+  return { user, token };
 }
 
-
-// Use in API routes where you have req
-// For API routes
+// 🔐 For API routes
 export async function validateRequest(req?: { headers?: { cookie?: string } }) {
   const cookieHeader = req?.headers?.cookie ?? "";
-  const cookies = cookie.parse(cookieHeader);
-  const rawUser = cookies["user"];
-  const token = cookies["access_token"];
+  const parsedCookies = cookie.parse(cookieHeader);
+  const rawUser = parsedCookies["user"];
+  const token = parsedCookies["access_token"];
+
   if (!rawUser || !token) return { user: null, token: null };
 
-  try {
-    const user = JSON.parse(rawUser);
-    return { user, token };
-  } catch {
-    return { user: null, token: null };
-  }
+  const user = decodeUser(rawUser);
+  return { user, token };
 }
-
-
-
-// Use in UploadThing where only raw cookie is available
-export async function validateRequestFromCookie(rawCookie: string | undefined) {
-  const cookies = cookie.parse(rawCookie || "");
-  const token = cookies["keycloak_session"];
-  if (!token) return { user: null, token: null };
-
-  try {
-    const user = await getUserInfo(token);
-    return { user, token };
-  } catch {
-    return { user: null, token: null };
-  }
-}
-

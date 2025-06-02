@@ -40,15 +40,19 @@ export interface PostData {
   postId: string;
   caption: string | null;
   createdAt: string;
-  user: UserData
+  user: UserData;
   attachments: {
     id: string;
     url: string;
     type: "IMAGE" | "VIDEO";
   }[];
   comments: any[];
-  reactions: ReactionData[];;
-  _count: PostCountData;
+  reactionCounts: Record<string, number>;
+  reactions: { userId: string; type: ReactionType }[];
+  _count: {
+    likes: number;
+    comments: number;
+  };
   bookmarks?: { userId: string }[];
 }
 
@@ -56,7 +60,6 @@ export interface PostsPage {
   posts: PostData[];
   nextCursor: string | null;
 }
-
 
 // ========== COMMENT ==========
 

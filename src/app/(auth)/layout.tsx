@@ -8,6 +8,8 @@ export default async function Layout({
 }) {
   const accessToken = cookies().get("access_token")?.value;
 
+  console.debug("[auth/layout] Access Token:", accessToken);
+
   if (accessToken) {
     // user is logged in, redirect to home
     redirect("/");

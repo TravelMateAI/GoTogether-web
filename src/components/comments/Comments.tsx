@@ -26,35 +26,28 @@ interface CommentsProps {
 }
 
 export default function Comments({ post }: CommentsProps) {
-  // console.log("Post 3 :",post);
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    status,
-    error,
-  } = useInfiniteQuery({
-    queryKey: ["comments", post.postId],
-    queryFn: async ({ pageParam = 0 }) => {
-      return kyInstance
-        .get(`api/posts/${post.postId}/comments`, {
-          searchParams: { page: pageParam, size: 5 },
-        })
-        .json<PageResponse>();
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.nextPage : undefined,
-  });
-  // console.log(error);
+  console.log("Post 3 :", post);
+  const { data, fetchNextPage, hasNextPage, isFetching, status, error } =
+    useInfiniteQuery({
+      queryKey: ["comments", post.postId],
+      queryFn: async ({ pageParam = 0 }) => {
+        return kyInstance
+          .get(`api/posts/${post.postId}/comments`, {
+            searchParams: { page: pageParam, size: 5 },
+          })
+          .json<PageResponse>();
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) =>
+        lastPage.hasNext ? lastPage.nextPage : undefined,
+    });
+  console.log(error);
 
-  // console.log("Data : ",data);
+  console.log("Data : ", data);
 
-  const comments =
-    data?.pages.flatMap((page) => page.comments) || [];
+  const comments = data?.pages.flatMap((page) => page.comments) || [];
 
-    // console.log("Comments : ",comments);
+  console.log("Comments : ", comments);
 
   return (
     <div className="space-y-3">
