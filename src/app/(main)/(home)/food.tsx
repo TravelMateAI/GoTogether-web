@@ -1,10 +1,9 @@
 import React from "react";
-import { Text, View } from "react-native";
 
 export default function FoodScreen() {
   return (
-    <View className="mt-5">
-      <Text className="text-3xl font-bold">This is the Food Screen</Text>
-    </View>
+    <div className="mt-5">
+      <h1 className="text-3xl font-bold">This is the Food Screen</h1>
+    </div>
   );
 }

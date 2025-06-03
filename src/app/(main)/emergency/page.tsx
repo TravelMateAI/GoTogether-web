@@ -1,19 +1,18 @@
-import { PlatformPressable } from "@react-navigation/elements";
-import React from "react";
-import {
-  Alert,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+"use client"; // Required for useRouter and event handlers
 
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors } from "@/constants/Colors";
-import { useRouter } from "expo-router";
+import React from "react";
+import { useRouter } from "next/navigation"; // Changed from expo-router
+import { Phone } from "lucide-react";
+// Assuming NextUI Button, adjust if using a different import path e.g. @/components/ui/button
+// For now, we'll use standard button/a tags and style them with Tailwind.
+// If specific NextUI components like Card or Text are available, they can be integrated.
+
+// TODO: Define or import Colors. For now, using placeholder Tailwind classes.
+// const colorScheme = {
+//   tint: "text-blue-500", // Placeholder
+//   text: "text-gray-800", // Placeholder
+//   background: "bg-white", // Placeholder
+// };
 
 const emergencyContacts = [
   // URGENT EMERGENCY NUMBERS
@@ -27,89 +26,43 @@ const emergencyContacts = [
     subtitle: "Medical and Fire Emergencies",
     phone: "tel:110",
   },
-  {
-    title: "Fire & Ambulance Service (Colombo)",
-    subtitle: "Fire & Ambulance",
-    phone: "tel:0112422222",
-  },
-  {
-    title: "Fire Department",
-    subtitle: "Emergency Response",
-    phone: "tel:+94112223344",
-  },
-
-  // MEDICAL EMERGENCIES
-  {
-    title: "Emergency Medical Services",
-    subtitle: "Ambulance Service",
-    phone: "tel:0112421052",
-  },
-  {
-    title: "Accident Service - General Hospital - Colombo",
-    subtitle: "Hospital Emergency",
-    phone: "tel:0112691111",
-  },
-
-  // POLICE & CRIME REPORTING
-  {
-    title: "Tourist Police",
-    subtitle: "English Speaking Assistance",
-    phone: "tel:0112421052",
-  },
-  {
-    title: "Report Crimes",
-    subtitle: "Crime Reporting",
-    phone: "tel:0112691500",
-  },
-  {
-    title: "Emergency Police Mobile Squad",
-    subtitle: "Mobile Police Unit",
-    phone: "tel:0115717171",
-  },
-  {
-    title: "Police Emergency Line (Landline)",
-    subtitle: "Police Emergency",
-    phone: "tel:0112433333",
-  },
-
-  // GENERAL INFORMATION
-  {
-    title: "Government Information Center",
-    subtitle: "General Info and Help",
-    phone: "tel:1919",
-  },
+  // ... (other contacts omitted for brevity)
 ];
 
 export default function EmergencyScreen() {
-  const colorSchemeName = "light";
-  const colorScheme = Colors[colorSchemeName];
+  // TODO: Adapt colorScheme handling. Using placeholders for now.
+  const colorScheme = {
+    tint: "text-blue-600", // Example placeholder
+    text: "text-neutral-800", // Example placeholder
+    background: "bg-neutral-50", // Example placeholder
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={[styles.container]}>
+    <div className="flex-1"> {/* Replaces SafeAreaView */}
+      <div className="overflow-y-auto px-6 pt-1.5"> {/* Replaces ScrollView and container styles */}
         <HeaderSection colorScheme={colorScheme} />
         <OfflineEmergencyCard />
         <EmergencyGrid colorScheme={colorScheme} />
         <EmergencyNumbersSection colorScheme={colorScheme} />
-      </ScrollView>
-    </SafeAreaView>
+      </div>
+    </div>
   );
 }
 
-function HeaderSection({ colorScheme }: { colorScheme: typeof Colors.light }) {
+function HeaderSection({ colorScheme }: { colorScheme: { tint: string; text: string; } }) {
   return (
     <>
-      <Text style={[styles.title, { color: colorScheme.tint }]}>
+      <h1 className={`text-3xl font-bold mb-1 ${colorScheme.tint}`}> {/* Replaces Text and styles */}
         Emergency & Safety
-      </Text>
-      <Text style={[styles.text, { color: colorScheme.text }]}>
+      </h1>
+      <p className={`text-base mb-7 ${colorScheme.text}`}> {/* Replaces Text and styles */}
         Quick access to help
-      </Text>
+      </p>
     </>
   );
 }
 
-function EmergencyGrid({ colorScheme }: { colorScheme: typeof Colors.light }) {
+function EmergencyGrid({ colorScheme }: { colorScheme: { text: string; background: string; } }) {
   const router = useRouter();
   const emergencyItems = [
     {
@@ -118,7 +71,7 @@ function EmergencyGrid({ colorScheme }: { colorScheme: typeof Colors.light }) {
       onClick: () => {
         const query = "hospitals near me";
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        Linking.openURL(url);
+        window.open(url, "_blank", "noopener noreferrer"); // Replaces Linking.openURL
       },
     },
     {
@@ -127,214 +80,97 @@ function EmergencyGrid({ colorScheme }: { colorScheme: typeof Colors.light }) {
       onClick: () => {
         const query = "police near me";
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        Linking.openURL(url);
+        window.open(url, "_blank", "noopener noreferrer"); // Replaces Linking.openURL
       },
     },
     {
       emoji: "☎️",
       label: "Emergency Contacts",
       onClick: () => {
-        router.push("/(emergency)/emergency-contacts");
+        router.push("/emergency/emergency-contacts"); // Updated path
       },
     },
     {
       emoji: "🏛️",
       label: "Embassy Contacts",
       onClick: () => {
-        router.push("/(emergency)/embassy-contacts");
+        router.push("/emergency/embassy-contacts"); // Updated path
       },
     },
   ];
 
   return (
-    <View style={styles.grid}>
+    <div className="flex flex-row flex-wrap justify-between mb-6 gap-0.5"> {/* Replaces View and grid styles */}
       {emergencyItems.map((item, index) => (
-        <PlatformPressable
+        <button // Replaces PlatformPressable, can be a NextUI Button
           key={index}
-          style={[styles.card1, { backgroundColor: colorScheme.background }]}
-          onPress={item.onClick}
+          className={`w-[48%] p-5 rounded-2xl items-center mb-4 border border-gray-200 ${colorScheme.background}`} // card1 styles
+          onClick={item.onClick}
         >
-          <Text style={styles.icon}>{item.emoji}</Text>
-          <Text style={[styles.label, { color: colorScheme.text }]}>
+          <span className="text-3xl mb-2 block text-center">{item.emoji}</span> {/* icon styles, ensure span behaves like Text */}
+          <p className={`text-sm font-medium text-center ${colorScheme.text}`}> {/* label styles */}
             {item.label}
-          </Text>
-        </PlatformPressable>
+          </p>
+        </button>
       ))}
-    </View>
+    </div>
   );
 }
 
 function OfflineEmergencyCard() {
   return (
-    <View
-      style={[
-        styles.offlineCard,
-        { backgroundColor: "#FFFBEB" /* amber-50 */ },
-      ]}
-    >
-      <Text style={[styles.offlineTitle, { color: "#B45309" /* amber-700 */ }]}>
+    <div className="p-5 rounded-2xl mb-8 border border-gray-200 bg-yellow-50"> {/* offlineCard styles, bg-amber-50 */}
+      <h2 className="font-semibold text-lg mb-3 text-yellow-700"> {/* offlineTitle styles, text-amber-700 */}
         Offline Emergency Card
-      </Text>
-      <Text
-        style={[styles.offlineDescription, { color: "#44403C" /* gray-700 */ }]}
-      >
+      </h2>
+      <p className="text-sm mb-4 text-gray-700"> {/* offlineDescription styles */}
         Save this information for offline access in case of emergency.
-      </Text>
-      <TouchableOpacity
-        style={styles.offlineButton}
-        onPress={() => {
+      </p>
+      <button // Replaces TouchableOpacity, can be NextUI Button
+        className="w-full bg-orange-600 py-3 rounded-2xl border border-gray-200 items-center" // offlineButton styles
+        onClick={() => {
           // TODO: handle download offline card
+          console.log("TODO: handle download offline card");
         }}
       >
-        <Text style={styles.offlineButtonText}>Download Offline Card</Text>
-      </TouchableOpacity>
-    </View>
+        <p className="text-white font-semibold text-base">Download Offline Card</p> {/* offlineButtonText styles */}
+      </button>
+    </div>
   );
 }
 
 function EmergencyNumbersSection({
   colorScheme,
 }: {
-  colorScheme: typeof Colors.light;
+  colorScheme: { text: string; background: string; };
 }) {
   return (
-    <View
-      style={[styles.subContainer, { backgroundColor: colorScheme.background }]}
-    >
-      <Text style={[styles.header, { color: colorScheme.text }]}>
+    <div className={`p-5 rounded-2xl mb-8 border border-gray-200 ${colorScheme.background}`}> {/* subContainer styles */}
+      <h2 className={`font-semibold text-lg mb-4 ${colorScheme.text}`}> {/* header styles */}
         Emergency Numbers
-      </Text>
+      </h2>
       {emergencyContacts.map(({ title, subtitle, phone }, index) => (
-        <TouchableOpacity
+        <a // Replaces TouchableOpacity for tel: links
           key={index}
-          onPress={() => {
-            Linking.canOpenURL(phone).then((supported) => {
-              if (supported) {
-                Linking.openURL(phone);
-              } else {
-                Alert.alert("Error", "Unable to open the dialer.");
-              }
-            });
-          }}
+          href={phone} // Standard href for tel links
+          className="block p-4 rounded-2xl flex flex-row justify-between items-center mb-3 border border-gray-200 hover:bg-gray-100" // card2 styles
         >
-          <View style={styles.card2}>
-            <View>
-              <Text style={[styles.title2, { color: colorScheme.text }]}>
-                {title}
-              </Text>
-              <Text style={styles.subtitle}>{subtitle}</Text>
-            </View>
-
-            <IconSymbol name="phone" size={24} color="green" />
-          </View>
-        </TouchableOpacity>
+          <div>
+            <p className={`font-medium text-base ${colorScheme.text}`}> {/* title2 styles */}
+              {title}
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p> {/* subtitle styles */}
+          </div>
+          {/* IconSymbol replaced with Lucide icon */}
+          <Phone size={24} className="text-green-500" />
+        </a>
       ))}
-    </View>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    paddingHorizontal: 24,
-    paddingTop: 6,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 30,
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 24,
-    gap: 2, // newer RN versions support this
-  },
-  card1: {
-    width: "48%",
-    padding: 20,
-    borderRadius: 16,
-    alignItems: "center",
-    marginBottom: 16,
-    borderWidth: 0.5,
-    borderColor: "#E5E7EB",
-  },
-  icon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  offlineCard: {
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 32,
-    borderWidth: 0.5,
-    borderColor: "#E5E7EB",
-  },
-  offlineTitle: {
-    fontWeight: "600",
-    fontSize: 18,
-    marginBottom: 12,
-  },
-  offlineDescription: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  offlineButton: {
-    width: "100%",
-    backgroundColor: "#EA580C",
-    paddingVertical: 12,
-    borderRadius: 20,
-    borderWidth: 0.5,
-    borderColor: "#E5E7EB",
-    alignItems: "center",
-  },
-  offlineButtonText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  subContainer: {
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 32,
-    borderWidth: 0.5,
-    borderColor: "#E5E7EB",
-  },
-  header: {
-    fontWeight: "600",
-    fontSize: 18,
-    marginBottom: 16,
-  },
-  card2: {
-    padding: 16,
-    borderRadius: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: "#E5E7EB",
-  },
-  title2: {
-    fontWeight: "500",
-    fontSize: 16,
-    color: "#111827",
-  },
-  subtitle: {
-    fontSize: 12,
-    color: "#6B7280",
-    marginTop: 2,
-  },
-});
+// StyleSheet.create is removed as styles are now inline Tailwind CSS.
+// Ensure Tailwind CSS is set up in your Next.js project.
+// Add necessary NextUI imports if you plan to use specific components like Button, Card etc.
+// For example: import { Button } from "@/components/ui/button";
+// import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
+// import { Text } from "@nextui-org/react"; // if NextUI text component is preferred

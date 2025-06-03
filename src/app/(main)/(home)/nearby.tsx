@@ -1,10 +1,9 @@
 import React from "react";
-import { Text, View } from "react-native";
 
 export default function NearbyScreen() {
   return (
-    <View className="mt-5">
-      <Text className="text-3xl font-bold">This is the Nearby Screen</Text>
-    </View>
+    <div className="mt-5">
+      <h1 className="text-3xl font-bold">This is the Nearby Screen</h1>
+    </div>
   );
 }
