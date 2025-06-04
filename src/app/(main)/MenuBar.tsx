@@ -1,6 +1,6 @@
 import { validateRequestServer } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Home, Rss } from "lucide-react";
+import { Bookmark, Home, Rss, ListChecks, Siren } from "lucide-react";
 import Link from "next/link";
 import MessagesButton from "./MessagesButton";
 import NotificationsButton from "./NotificationsButton";
@@ -49,6 +49,30 @@ export default async function MenuBar({ className }: MenuBarProps) {
         <Link href="/bookmarks">
           <Bookmark />
           <span className="hidden lg:inline">Bookmarks</span>
+        </Link>
+      </Button>
+
+      <Button
+        variant="ghost"
+        className="flex items-center justify-start gap-3"
+        title="Planner"
+        asChild
+      >
+        <Link href="/planner">
+          <ListChecks />
+          <span className="hidden lg:inline">Planner</span>
+        </Link>
+      </Button>
+
+      <Button
+        variant="ghost"
+        className="flex items-center justify-start gap-3"
+        title="Emergency"
+        asChild
+      >
+        <Link href="/emergency">
+          <Siren />
+          <span className="hidden lg:inline">Emergency</span>
         </Link>
       </Button>
 
