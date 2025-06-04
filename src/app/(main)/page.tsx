@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, startTransition } from "react"; // Added startTransition
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -14,35 +14,8 @@ import {
   Siren,
   ListChecks
 } from "lucide-react";
-
-// Assuming getHiddenLocations is adapted for web (e.g., uses fetch)
-// import { getHiddenLocations } from "@/services/location-service";
-// import { LocationDetail } from "@/types/location-types";
-
-// Placeholder for location service - replace with actual implementation
-const getHiddenLocations = async (type: string): Promise<any[]> => {
-  console.log(`Fetching hidden locations for ${type}`);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // Return mock data based on type for demonstration
-  const mockImages: Record<string, { id: string; image: string; title: string; route?: keyof typeof ROUTES; externalUrl?: string }[]> = {
-    "Top Picks": [
-      { id: "tp1", image: "/assets/images/top-picks/img1.jpg", title: "Beautiful Beach" },
-      { id: "tp2", image: "/assets/images/top-picks/img2.jpg", title: "Mountain View" },
-      { id: "tp3", image: "/assets/images/top-picks/img3.jpg", title: "Historic Site" },
-    ],
-    "Entertainment": [
-      { id: "e1", image: "/assets/images/entertainment/img1.jpg", title: "Local Concert" },
-      { id: "e2", image: "/assets/images/entertainment/img2.jpg", title: "Street Performance" },
-    ],
-    "Culture": [
-      { id: "c1", image: "/assets/images/culture/img1.jpg", title: "Museum Visit" },
-      { id: "c2", image: "/assets/images/culture/img2.jpg", title: "Art Gallery" },
-    ],
-  };
-  return mockImages[type] || [];
-};
-
+import { getNearbyPlacesAction } from "./actions"; // Import server action
+// import { LocationDetail } from "@/types/location-types"; // Assuming LocationDetail is the type in result.data
 
 // Define ROUTES for Next.js (example)
 export const ROUTES = {
@@ -75,38 +48,108 @@ export default function HomeScreen() {
   const [culture, setCulture] = useState<any[]>([]);
   const [loadingCulture, setLoadingCulture] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      // Location permission and fetching
+  // Helper to get current latitude and longitude
+  const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            try {
-              // For simplicity, not using reverse geocoding here.
-              // In a real app, you'd convert lat/lon to a city name.
-              setLocation(`Lat: ${position.coords.latitude.toFixed(2)}, Lon: ${position.coords.longitude.toFixed(2)}`);
-            } catch (e) {
-              setErrorMsg("Failed to fetch location details.");
-              console.error(e);
-            }
-          },
+          (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
           (error) => {
-            setErrorMsg("Permission to access location was denied.");
-            console.error(error);
+            console.error("Error getting location:", error);
+            setErrorMsg("Permission to access location was denied. Using default location for nearby places.");
+            // Fallback to a default location if permission is denied or error occurs
+            resolve({ lat: 40.7128, lng: -74.0060 }); // Default: New York
           }
         );
       } else {
-        setErrorMsg("Geolocation is not supported by this browser.");
+        setErrorMsg("Geolocation is not supported by this browser. Using default location for nearby places.");
+        resolve({ lat: 40.7128, lng: -74.0060 }); // Default: New York
+      }
+    });
+  };
+
+  useEffect(() => {
+    // Set initial location display
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation(`Lat: ${position.coords.latitude.toFixed(2)}, Lon: ${position.coords.longitude.toFixed(2)}`);
+        },
+        (error) => {
+          setErrorMsg("Permission to access location was denied.");
+          console.error(error);
+        }
+      );
+    } else {
+      setErrorMsg("Geolocation is not supported by this browser.");
+    }
+
+    const fetchData = async () => {
+      // Fetch Top Picks
+      setLoadingTopPicks(true);
+      try {
+        const { lat, lng } = await getCurrentLatLng();
+        const locationString = `${lat},${lng}`;
+        startTransition(async () => {
+          const result = await getNearbyPlacesAction(locationString, ["tourist_attraction", "park"], 5000);
+          if (result.success && result.data) {
+            setTopPicks(result.data.slice(0, 10));
+          } else {
+            console.error("Error fetching top picks:", result.error);
+            setTopPicks([]);
+          }
+        });
+      } catch (error) {
+        console.error("Error in fetchTopPicks setup:", error);
+        setTopPicks([]);
+      } finally {
+        setLoadingTopPicks(false);
       }
 
-      // Fetch initial data
-      setLoadingTopPicks(true);
-      getHiddenLocations("Top Picks").then(setTopPicks).finally(() => setLoadingTopPicks(false));
+      // Fetch Entertainment
       setLoadingEntertainment(true);
-      getHiddenLocations("Entertainment").then(setEntertainment).finally(() => setLoadingEntertainment(false));
+      try {
+        const { lat, lng } = await getCurrentLatLng(); // Potentially re-ask or use cached from above
+        const locationString = `${lat},${lng}`;
+        startTransition(async () => {
+          const result = await getNearbyPlacesAction(locationString, ["movie_theater", "night_club"], 5000);
+          if (result.success && result.data) {
+            setEntertainment(result.data.slice(0, 10));
+          } else {
+            console.error("Error fetching entertainment:", result.error);
+            setEntertainment([]);
+          }
+        });
+      } catch (error) {
+        console.error("Error in fetchEntertainment setup:", error);
+        setEntertainment([]);
+      } finally {
+        setLoadingEntertainment(false);
+      }
+
+      // Fetch Culture
       setLoadingCulture(true);
-      getHiddenLocations("Culture").then(setCulture).finally(() => setLoadingCulture(false));
-    })();
+      try {
+        const { lat, lng } = await getCurrentLatLng(); // Potentially re-ask or use cached from above
+        const locationString = `${lat},${lng}`;
+        startTransition(async () => {
+          const result = await getNearbyPlacesAction(locationString, ["museum", "art_gallery"], 5000);
+          if (result.success && result.data) {
+            setCulture(result.data.slice(0, 10));
+          } else {
+            console.error("Error fetching culture:", result.error);
+            setCulture([]);
+          }
+        });
+      } catch (error) {
+        console.error("Error in fetchCulture setup:", error);
+        setCulture([]);
+      } finally {
+        setLoadingCulture(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleNavigation = (routeKey: RouteKey) => {
