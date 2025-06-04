@@ -25,60 +25,17 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
   images,
 }) => { // Ensuring this opening brace and arrow function syntax is clean
   return ( // Ensuring this return and opening parenthesis are clean
-    // <div className="mb-8"> {/* Replaced View, adjusted margin */}
-    //   <div className="flex flex-row justify-between items-center mb-3"> {/* Replaced View */}
-    //     <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2> {/* Dark mode for title */}
-    //     <button
-    //       onClick={() => handleNavigation(scrollButton.route)}
-    //       className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
-    //     >
-    //       See all
-    //     </button> {/* Dark mode for "See all" button */}
-    //   </div>
-    //   {scrollButton.loading ? (
-    //     <p className="my-4 text-center text-gray-600 dark:text-gray-400">Loading...</p> /* Dark mode for loading text */
-    //   ) : (
-    //     <div className="flex overflow-x-auto space-x-4 pb-2 -mx-1 px-1"> {/* Replaced FlatList, added padding for scrollbar visibility and space-x for item margin */}
-    //       {cardData.length === 0 && !scrollButton.loading && (
-    //         <p className="text-gray-500 dark:text-gray-400">No items to display currently.</p> /* Dark mode for empty state text */
-    //       )}
-    //       {cardData.map((item, index) => {
-    //         const imagePath = images[index % images.length];
-    //         return (
-    //           <div // Replaces ImageBackground's outer structure
-    //             key={`${item.name}-${item.location.lat}-${item.location.lng}`}
-    //             onClick={() => {
-    //               // Assuming clicking a card might navigate to its detail page in the future
-    //               // For now, this example doesn't make individual cards clickable to a specific route
-    //               // but one could be added to LocationDetail if needed.
-    //               console.log("Card clicked:", item.name);
-    //             }}
-    //             className="group relative w-52 h-36 rounded-xl overflow-hidden shadow-lg cursor-pointer"
-    //             // Removed transform hover:scale-105 transition-transform duration-200 from here, will apply to Image if desired
-    //           >
-    //             <Image
-    //               src={imagePath}
-    //               alt={item.name}
-    //               layout="fill"
-    //               objectFit="cover"
-    //               className="transition-transform duration-300 group-hover:scale-110" // Apply zoom effect on image
-    //             />
-    //             {/* TODO: Review card overlay (bg-black/40) in dark mode for readability if needed. */}
-    //             <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:bg-black/50" /> {/* Overlay */}
-    //             <div className="absolute bottom-0 left-0 p-3 z-10"> {/* Ensure text is above overlay */}
-    //               <p className="text-white text-sm font-semibold drop-shadow-md">
-    //                 {item.name}
-    //               </p>
-    //               {/* You could add more details here if available in item, e.g., item.category */}
-    //             </div>
-    //           </div>
-    //         );
-    //       })}
-    //     </div>
-    //   )}
-    // </div>
-    <div>
-      <p>Test: {title}</p>
+    <div className="mb-8"> {/* Replaced View, adjusted margin */}
+      <div className="flex flex-row justify-between items-center mb-3"> {/* Replaced View */}
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2> {/* Dark mode for title */}
+        <button
+          onClick={() => handleNavigation(scrollButton.route)}
+          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+        >
+          See all
+        </button> {/* Dark mode for "See all" button */}
+      </div>
+      {/* More JSX will be restored here in subsequent steps */}
     </div>
   ); // Ensuring this closing parenthesis is clean
 }; // Ensuring this closing brace and semicolon are clean
