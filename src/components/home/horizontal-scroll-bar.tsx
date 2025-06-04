@@ -1,9 +1,10 @@
 "use client";
 
 import { LocationDetail } from "@/types/location-types";
-import React, { useRef, useState, useEffect, useCallback } from "react"; // Added useRef, useState, useEffect, useCallback
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight } from "lucide-react"; // Added Chevron icons
+import Link from 'next/link'; // Added Link import
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ScrollButton {
   route: string;
@@ -120,15 +121,14 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
             const imagePath = images[index % images.length];
             // console.log(`HorizontalScrollBar ("${title}"): Rendering card for item:`, item, "with imagePath:", imagePath);
             return (
-              <div
+              <Link
+                href={`/place/${item.place_id}`}
                 key={item.place_id || `${item.name}-${index}`}
-                onClick={() => {
-                  console.log("Card clicked:", item.name);
-                }}
                 className="group relative h-36 overflow-hidden rounded-xl shadow-lg cursor-pointer w-[calc(50%-0.5rem)] sm:w-[calc(100%/3-0.75rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(100%/6-0.833rem)] flex-shrink-0"
+                // onClick={() => console.log("Card Link clicked:", item.name)} // Optional: for debugging link click
               >
                 <Image
-                  src={imagePath || '/assets/images/default-placeholder.png'} // Fallback for imagePath itself
+                  src={imagePath || '/assets/images/default-placeholder.png'}
                   alt={item.name}
                   layout="fill"
                   objectFit="cover"
@@ -154,10 +154,10 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
 export default HorizontalScrollBar;
 
 // Notes:
-// 1. Assumed `LocationDetail` contains `name` and `location: { lat, lng }`. Also place_id for keys.
+// 1. Assumed `LocationDetail` contains `name`, `location: { lat, lng }`, and `place_id`.
 // 2. `images` prop should now be an array of string paths accessible from the web.
-// 3. Individual card click action is currently a console log.
-// 4. Card widths are now responsive using calc() for various breakpoints. Added flex-shrink-0 to cards.
+// 3. Individual card click action replaced by Link navigation.
+// 4. Card widths are responsive; Link component now acts as the card container.
 // 5. Added a message for when cardData is empty but not loading.
 // 6. The `scrollButton.route` should be a valid Next.js path or a RouteKey if handleNavigation expects that.
 // 7. Improved styling for "See all" button and card appearance.
