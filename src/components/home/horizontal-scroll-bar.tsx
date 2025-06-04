@@ -2,9 +2,11 @@
 
 import { LocationDetail } from "@/types/location-types";
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import Image from 'next/image';
-import Link from 'next/link';
+// Image and Link imports are likely no longer needed here as PlaceCard handles them.
+// import Image from 'next/image';
+// import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PlaceCard from './PlaceCard'; // Import the new PlaceCard component
 
 interface ScrollButton {
   route: string;
@@ -107,27 +109,13 @@ const HorizontalScrollBar = (props: HorizontalScrollBarProps): React.JSX.Element
           )}
           {cardData.map((item, index) => {
             const imagePath = (images && images.length > index && images[index]) ? images[index] : '/assets/images/default-placeholder.png';
+            // console.log(\`HorizontalScrollBar ("${title}"): Rendering PlaceCard for item:\`, item, "with imagePath:", imagePath);
             return (
-              <Link
-                href={`/place/${item.place_id}`}
+              <PlaceCard
                 key={item.place_id || \`\${item.name}-\${index}\`}
-                className="group relative h-36 rounded-xl overflow-hidden shadow-lg cursor-pointer flex-shrink-0 w-[calc(50%-0.5rem)] sm:w-[calc(100%/3-0.75rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(100%/6-0.833rem)] transition-all duration-200 ease-in-out hover:shadow-xl"
-              >
-                <Image
-                  src={imagePath}
-                  alt={item.name}
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-300 group-hover:scale-110"
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/default-placeholder.png'; }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-300 group-hover:from-black/60 group-hover:via-black/30" />
-                <div className="absolute bottom-0 left-0 p-3 z-10">
-                  <p className="text-white text-sm font-semibold drop-shadow-md">
-                    {item.name}
-                  </p>
-                </div>
-              </Link>
+                item={item}
+                imagePath={imagePath}
+              />
             );
           })}
         </div>
@@ -140,4 +128,5 @@ export default HorizontalScrollBar;
 
 // Notes section intentionally kept minimal to avoid reintroducing EOF errors.
 // Key features: Explicit function signature, explicit return type, props destructured inside function body.
+// Refactored to use PlaceCard component for rendering items.
 ```
