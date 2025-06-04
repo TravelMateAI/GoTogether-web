@@ -23,8 +23,8 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
   scrollButton,
   handleNavigation,
   images,
-}) => {
-  return (
+}) => { // Ensuring this opening brace and arrow function syntax is clean
+  return ( // Ensuring this return and opening parenthesis are clean
     <div className="mb-8"> {/* Replaced View, adjusted margin */}
       <div className="flex flex-row justify-between items-center mb-3"> {/* Replaced View */}
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2> {/* Dark mode for title */}
@@ -77,8 +77,8 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  ); // Ensuring this closing parenthesis is clean
+}; // Ensuring this closing brace and semicolon are clean
 
 export default HorizontalScrollBar;
 
