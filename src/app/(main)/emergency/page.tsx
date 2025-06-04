@@ -50,12 +50,13 @@ export default function EmergencyScreen() {
 }
 
 function HeaderSection({ colorScheme }: { colorScheme: { tint: string; text: string; } }) {
+  // Applying dark mode variants directly, assuming colorScheme.tint = "text-blue-600" and colorScheme.text = "text-neutral-800"
   return (
     <>
-      <h1 className={`text-3xl font-bold mb-1 ${colorScheme.tint}`}> {/* Replaces Text and styles */}
+      <h1 className={`text-3xl font-bold mb-1 ${colorScheme.tint} dark:text-blue-400`}> {/* Replaces Text and styles */}
         Emergency & Safety
       </h1>
-      <p className={`text-base mb-7 ${colorScheme.text}`}> {/* Replaces Text and styles */}
+      <p className={`text-base mb-7 ${colorScheme.text} dark:text-neutral-300`}> {/* Replaces Text and styles */}
         Quick access to help
       </p>
     </>
@@ -104,11 +105,12 @@ function EmergencyGrid({ colorScheme }: { colorScheme: { text: string; backgroun
       {emergencyItems.map((item, index) => (
         <button // Replaces PlatformPressable, can be a NextUI Button
           key={index}
-          className={`w-[48%] p-5 rounded-2xl items-center mb-4 border border-gray-200 ${colorScheme.background}`} // card1 styles
+          // Assuming colorScheme.background = "bg-neutral-50" and colorScheme.text = "text-neutral-800"
+          className={`w-[48%] p-5 rounded-2xl items-center mb-4 border border-gray-200 dark:border-slate-700 ${colorScheme.background} dark:bg-slate-800`} // card1 styles
           onClick={item.onClick}
         >
           <span className="text-3xl mb-2 block text-center">{item.emoji}</span> {/* icon styles, ensure span behaves like Text */}
-          <p className={`text-sm font-medium text-center ${colorScheme.text}`}> {/* label styles */}
+          <p className={`text-sm font-medium text-center ${colorScheme.text} dark:text-neutral-200`}> {/* label styles */}
             {item.label}
           </p>
         </button>
@@ -119,15 +121,15 @@ function EmergencyGrid({ colorScheme }: { colorScheme: { text: string; backgroun
 
 function OfflineEmergencyCard() {
   return (
-    <div className="p-5 rounded-2xl mb-8 border border-gray-200 bg-yellow-50"> {/* offlineCard styles, bg-amber-50 */}
-      <h2 className="font-semibold text-lg mb-3 text-yellow-700"> {/* offlineTitle styles, text-amber-700 */}
+    <div className="p-5 rounded-2xl mb-8 border border-gray-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/70"> {/* offlineCard styles, bg-amber-50 */}
+      <h2 className="font-semibold text-lg mb-3 text-yellow-700 dark:text-yellow-300"> {/* offlineTitle styles, text-amber-700 */}
         Offline Emergency Card
       </h2>
-      <p className="text-sm mb-4 text-gray-700"> {/* offlineDescription styles */}
+      <p className="text-sm mb-4 text-gray-700 dark:text-yellow-200"> {/* offlineDescription styles */}
         Save this information for offline access in case of emergency.
       </p>
       <button // Replaces TouchableOpacity, can be NextUI Button
-        className="w-full bg-orange-600 py-3 rounded-2xl border border-gray-200 items-center" // offlineButton styles
+        className="w-full bg-orange-600 hover:bg-orange-700 py-3 rounded-2xl border border-gray-200 dark:border-yellow-800 items-center" // offlineButton styles - vibrant CTA, border adjusted
         onClick={() => {
           // TODO: handle download offline card
           console.log("TODO: handle download offline card");
@@ -144,25 +146,26 @@ function EmergencyNumbersSection({
 }: {
   colorScheme: { text: string; background: string; };
 }) {
+  // Assuming colorScheme.background = "bg-neutral-50" and colorScheme.text = "text-neutral-800"
   return (
-    <div className={`p-5 rounded-2xl mb-8 border border-gray-200 ${colorScheme.background}`}> {/* subContainer styles */}
-      <h2 className={`font-semibold text-lg mb-4 ${colorScheme.text}`}> {/* header styles */}
+    <div className={`p-5 rounded-2xl mb-8 border border-gray-200 dark:border-slate-700 ${colorScheme.background} dark:bg-slate-800`}> {/* subContainer styles */}
+      <h2 className={`font-semibold text-lg mb-4 ${colorScheme.text} dark:text-neutral-100`}> {/* header styles */}
         Emergency Numbers
       </h2>
       {emergencyContacts.map(({ title, subtitle, phone }, index) => (
         <a // Replaces TouchableOpacity for tel: links
           key={index}
           href={phone} // Standard href for tel links
-          className="block p-4 rounded-2xl flex flex-row justify-between items-center mb-3 border border-gray-200 hover:bg-gray-100" // card2 styles
+          className="block p-4 rounded-2xl flex flex-row justify-between items-center mb-3 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700" // card2 styles
         >
           <div>
-            <p className={`font-medium text-base ${colorScheme.text}`}> {/* title2 styles */}
+            <p className={`font-medium text-base ${colorScheme.text} dark:text-neutral-200`}> {/* title2 styles */}
               {title}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p> {/* subtitle styles */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p> {/* subtitle styles */}
           </div>
           {/* IconSymbol replaced with Lucide icon */}
-          <Phone size={24} className="text-green-500" />
+          <Phone size={24} className="text-green-500" /> {/* Phone icon color remains green */}
         </a>
       ))}
     </div>

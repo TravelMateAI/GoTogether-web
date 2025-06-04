@@ -166,18 +166,18 @@ export default function HomeScreen() {
   ];
 
   return (
-    <div className="flex-1 bg-gray-100"> {/* Replaces SafeAreaView */}
+    <div className="flex-1 bg-gray-100 dark:bg-slate-900"> {/* Page Background */}
       <div className="overflow-y-auto"> {/* Replaces ScrollView */}
-        <header className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 shadow-lg">
+        <header className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 shadow-lg"> {/* Gradient may remain, text is white/light blue */}
           <div className="flex justify-between items-center mb-4">
             <div>
               <p className="text-lg font-semibold text-white">Hello, Wanderer!</p>
-              <p className="text-sm text-blue-200">
+              <p className="text-sm text-blue-200 dark:text-blue-300"> {/* Location/Error Text */}
                 {location ? `Current Location: ${location}` : errorMsg || "Fetching location..."}
               </p>
             </div>
-            {/* Placeholder for a user profile icon or settings */}
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
+            {/* User initial circle */}
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 dark:bg-slate-700 dark:text-blue-300 font-bold">
               U
             </div>
           </div>
@@ -187,10 +187,10 @@ export default function HomeScreen() {
               placeholder="Search for places, activities..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-3 px-4 pl-10 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-full py-3 px-4 pl-10 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-slate-800 dark:text-gray-100 dark:focus:ring-yellow-500 dark:placeholder-gray-400"
             />
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <Search size={20} className="text-gray-400" />
+              <Search size={20} className="text-gray-400 dark:text-gray-500" />
             </span>
           </div>
         </header>
@@ -203,16 +203,16 @@ export default function HomeScreen() {
                 <button
                   key={button.title}
                   onClick={button.onPress}
-                  className={`flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow hover:shadow-lg transition-shadow aspect-square`}
+                  className={`flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg dark:hover:shadow-slate-700/50 transition-shadow aspect-square`}
                 >
-                  <span className={`text-3xl ${button.color}`}>{button.icon}</span> {/* Icon placeholder */}
-                  <span className="mt-1 text-xs font-medium text-center text-gray-700">{button.title}</span>
+                  <span className={`text-3xl ${button.color}`}>{button.icon}</span> {/* Icon placeholder - specific colors remain */}
+                  <span className="mt-1 text-xs font-medium text-center text-gray-700 dark:text-gray-300">{button.title}</span>
                 </button>
               ))}
             </div>
           </section>
 
-          {/* Horizontal Scroll Sections */}
+          {/* Horizontal Scroll Sections - Titles inside HorizontalScrollBar will need their own dark mode */}
           {sections.map((section) => {
             const currentData = section.loading ? [] : (section.apiData.length > 0 ? section.apiData : section.fallbackData);
             // Ensure cardData has a compatible structure for LocationDetail, particularly name and location
@@ -238,18 +238,19 @@ export default function HomeScreen() {
           })}
 
           {/* TODO: Add more sections as needed, e.g., Booking.com integration */}
-          <section className="my-6 p-4 bg-white rounded-lg shadow">
-             <h2 className="text-xl font-bold text-gray-800 mb-3">Plan Your Stay</h2>
+          <section className="my-6 p-4 bg-white dark:bg-slate-800 rounded-lg shadow">
+             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-3">Plan Your Stay</h2>
              <button
                 onClick={() => handleExternalLink("https://www.booking.com")}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow transition-colors flex items-center justify-center"
+                // Vibrant button, likely okay as is. Text is white.
              >
                 Search on Booking.com <Briefcase size={18} className="ml-2" />
              </button>
           </section>
 
         </main>
-        <footer className="py-4 text-center text-sm text-gray-500">
+        <footer className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>&copy; {new Date().getFullYear()} Your App Name. All rights reserved.</p>
         </footer>
       </div>

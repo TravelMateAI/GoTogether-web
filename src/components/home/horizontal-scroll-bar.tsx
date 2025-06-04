@@ -27,20 +27,20 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
   return (
     <div className="mb-8"> {/* Replaced View, adjusted margin */}
       <div className="flex flex-row justify-between items-center mb-3"> {/* Replaced View */}
-        <h2 className="text-2xl font-bold text-gray-800">{title}</h2> {/* Replaced Text, adjusted styling */}
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2> {/* Dark mode for title */}
         <button
           onClick={() => handleNavigation(scrollButton.route)}
-          className="text-indigo-600 hover:text-indigo-800 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
         >
           See all
-        </button> {/* Replaced TouchableOpacity and Text */}
+        </button> {/* Dark mode for "See all" button */}
       </div>
       {scrollButton.loading ? (
-        <p className="my-4 text-center text-gray-600">Loading...</p> /* Replaced ActivityIndicator */
+        <p className="my-4 text-center text-gray-600 dark:text-gray-400">Loading...</p> {/* Dark mode for loading text */}
       ) : (
         <div className="flex overflow-x-auto space-x-4 pb-2 -mx-1 px-1"> {/* Replaced FlatList, added padding for scrollbar visibility and space-x for item margin */}
           {cardData.length === 0 && !scrollButton.loading && (
-            <p className="text-gray-500">No items to display currently.</p>
+            <p className="text-gray-500 dark:text-gray-400">No items to display currently.</p> /* Dark mode for empty state text */
           )}
           {cardData.map((item, index) => {
             const imagePath = images[index % images.length];
@@ -63,6 +63,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
                   objectFit="cover"
                   className="transition-transform duration-300 group-hover:scale-110" // Apply zoom effect on image
                 />
+                {/* TODO: Review card overlay (bg-black/40) in dark mode for readability if needed. */}
                 <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:bg-black/50" /> {/* Overlay */}
                 <div className="absolute bottom-0 left-0 p-3 z-10"> {/* Ensure text is above overlay */}
                   <p className="text-white text-sm font-semibold drop-shadow-md">
@@ -90,3 +91,4 @@ export default HorizontalScrollBar;
 // 6. The `scrollButton.route` should be a valid Next.js path.
 // 7. Improved styling for "See all" button and card appearance.
 // 8. Added `pb-2 -mx-1 px-1` to the scrolling container to better manage padding with `space-x-4` and potential scrollbars.
+// 9. Card overlay (bg-black/40) might need review in dark mode for optimal text readability on very dark images, though it's generally effective.
