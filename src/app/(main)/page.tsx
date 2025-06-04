@@ -93,6 +93,7 @@ export default function HomeScreen() {
         startTransition(async () => {
           const result = await getNearbyPlacesAction(locationString, ["tourist_attraction", "park"], 5000);
           if (result.success && result.data) {
+            console.log("HomeScreen: Received data for Top Picks from Server Action:", result.data);
             setTopPicks(result.data.slice(0, 10));
           } else {
             console.error("Error fetching top picks:", result.error);
@@ -114,6 +115,7 @@ export default function HomeScreen() {
         startTransition(async () => {
           const result = await getNearbyPlacesAction(locationString, ["movie_theater", "night_club"], 5000);
           if (result.success && result.data) {
+            console.log("HomeScreen: Received data for Entertainment from Server Action:", result.data);
             setEntertainment(result.data.slice(0, 10));
           } else {
             console.error("Error fetching entertainment:", result.error);
@@ -135,6 +137,7 @@ export default function HomeScreen() {
         startTransition(async () => {
           const result = await getNearbyPlacesAction(locationString, ["museum", "art_gallery"], 5000);
           if (result.success && result.data) {
+            console.log("HomeScreen: Received data for Culture from Server Action:", result.data);
             setCulture(result.data.slice(0, 10));
           } else {
             console.error("Error fetching culture:", result.error);
