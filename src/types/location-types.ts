@@ -20,6 +20,7 @@ export interface LocationDetail {
     width: number;
     // html_attributions?: string[]; // Assuming this might be part of photos based on Google API
   }>;
+  photo_urls?: string[]; // Field for directly usable photo URLs from the Go backend
   // Additional fields based on common Google Places API responses that might be in your Go struct:
   // icon?: string; // URL to an icon
   // icon_background_color?: string;

@@ -185,47 +185,44 @@ export default function HomeScreen() {
 
   // Mock data for image paths - assuming they are moved to public/assets/images/
   // These structures are primarily for fallback if API fails or for providing image URLs
-  const topPicksImagesData = [
-    { id: "tp1", name: "Beach Paradise", image: "/assets/images/top-picks/img1.jpg", description: "Sun, sand, and sea.", location: { lat: 0, lng: 0 }, category: "Nature", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
-    { id: "tp2", name: "Mountain Hike", image: "/assets/images/top-picks/img2.jpg", description: "Breathtaking views await.", location: { lat: 0, lng: 0 }, category: "Adventure", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
-    { id: "tp3", name: "City Exploration", image: "/assets/images/top-picks/img3.jpg", description: "Discover urban wonders.", location: { lat: 0, lng: 0 }, category: "Urban", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
+  const topPicksFallbackImages = [
+    { id: "tp1", name: "Beach Paradise", image: "/assets/images/top-picks/img1.jpg", description: "Sun, sand, and sea.", location: { lat: 0, lng: 0 }, category: "Nature", route: "TOP_PICKS" as RouteKey },
+    { id: "tp2", name: "Mountain Hike", image: "/assets/images/top-picks/img2.jpg", description: "Breathtaking views await.", location: { lat: 0, lng: 0 }, category: "Adventure", route: "TOP_PICKS" as RouteKey },
+    { id: "tp3", name: "City Exploration", image: "/assets/images/top-picks/img3.jpg", description: "Discover urban wonders.", location: { lat: 0, lng: 0 }, category: "Urban", route: "TOP_PICKS" as RouteKey },
   ];
 
-  const entertainmentImagesData = [
+  const entertainmentFallbackImages = [
     { id: "e1", name: "Live Music Venue", image: "/assets/images/entertainment/img1.jpg", description: "Local bands and artists.", location: { lat: 0, lng: 0 }, category: "Music", route: "ENTERTAINMENT" as RouteKey },
     { id: "e2", name: "Cinema Complex", image: "/assets/images/entertainment/img2.jpg", description: "Latest movie releases.", location: { lat: 0, lng: 0 }, category: "Movies", route: "ENTERTAINMENT" as RouteKey },
   ];
 
-  const cultureImagesData = [
+  const cultureFallbackImages = [
     { id: "c1", name: "Historical Museum", image: "/assets/images/culture/img1.jpg", description: "Artifacts and exhibits.", location: { lat: 0, lng: 0 }, category: "History", route: "CULTURE" as RouteKey },
     { id: "c2", name: "Art Installation", image: "/assets/images/culture/img2.jpg", description: "Contemporary art pieces.", location: { lat: 0, lng: 0 }, category: "Art", route: "CULTURE" as RouteKey },
   ];
 
   // Sections for HorizontalScrollBar
-  const sections = [
+  const sectionsData = [
     {
       title: "⭐ Top Picks For You",
-      dataKey: "topPicks",
       loading: loadingTopPicks,
-      apiData: topPicks,
-      fallbackData: topPicksImagesData,
-      scrollButtonKey: "TOP_PICKS" as RouteKey // Changed to scrollButtonKey and RouteKey
+      apiData: topPicks, // Array of LocationDetail from API
+      fallbackImageSet: topPicksFallbackImages, // Used if item.photo_urls is missing
+      scrollButtonKey: "TOP_PICKS" as RouteKey,
     },
     {
       title: "🎬 Entertainment Hotspots",
-      dataKey: "entertainment",
       loading: loadingEntertainment,
       apiData: entertainment,
-      fallbackData: entertainmentImagesData,
-      scrollButtonKey: "ENTERTAINMENT" as RouteKey // Changed to scrollButtonKey and RouteKey
+      fallbackImageSet: entertainmentFallbackImages,
+      scrollButtonKey: "ENTERTAINMENT" as RouteKey,
     },
     {
       title: "🏛️ Cultural Experiences",
-      dataKey: "culture",
       loading: loadingCulture,
       apiData: culture,
-      fallbackData: cultureImagesData,
-      scrollButtonKey: "CULTURE" as RouteKey // Changed to scrollButtonKey and RouteKey
+      fallbackImageSet: cultureFallbackImages,
+      scrollButtonKey: "CULTURE" as RouteKey,
     }
   ];
 
@@ -278,25 +275,41 @@ export default function HomeScreen() {
           </section>
 
           {/* Horizontal Scroll Sections - Titles inside HorizontalScrollBar will need their own dark mode */}
-          {sections.map((section) => {
-            const currentData = section.loading ? [] : (section.apiData.length > 0 ? section.apiData : section.fallbackData);
-            // Ensure cardData has a compatible structure for LocationDetail, particularly name and location
-            // For mock data, we ensure 'name' and 'location' exist. API data should also conform.
-            const cardDataForScroll = currentData.map(item => ({
-              ...item,
-              name: item.name || item.title || "Unknown Place", // Ensure 'name' exists
-              location: item.location || { lat: 0, lng: 0 }, // Ensure 'location' exists
-            }));
+          {sectionsData.map((section) => {
+            // Determine the card data to pass: API data if not loading and available, otherwise fallback structured data.
+            // The HorizontalScrollBar expects 'name' and 'location' in its cardData items.
+            // API data (topPicks, entertainment, culture) should conform to LocationDetail.
+            // Fallback data (e.g., topPicksFallbackImages) also has these fields.
+            const cardDataForScroll = section.loading ? [] : (section.apiData.length > 0 ? section.apiData : section.fallbackImageSet);
+
+            // Prepare the images array for HorizontalScrollBar:
+            // Prioritize photo_urls from API data, then fallback.
+            const imagesForScroll = cardDataForScroll.map((place, index) => {
+              // Assuming 'place' is of type LocationDetail (or similar structure with photo_urls)
+              if (place.photo_urls && place.photo_urls.length > 0) {
+                return place.photo_urls[0];
+              }
+              // Fallback logic if no photo_urls from API for this place
+              if (section.fallbackImageSet.length > 0) {
+                 return section.fallbackImageSet[index % section.fallbackImageSet.length].image;
+              }
+              return "/assets/images/default-placeholder.png"; // Absolute last resort placeholder
+            });
 
             return (
               <HorizontalScrollBar
                 key={section.title}
                 title={section.title}
-                cardData={cardDataForScroll}
-                // The 'images' prop for HorizontalScrollBar expects string[] for background cycling
-                // We'll derive this from the fallbackData, assuming each item has an 'image' field.
-                images={section.fallbackData.map(item => item.image)}
-                scrollButton={{ route: section.scrollButtonKey, loading: section.loading }} // Pass RouteKey here
+                cardData={cardDataForScroll.map(item => ({ // Ensure structure matches LocationDetail for HorizontalScrollBar
+                    name: item.name || item.title || "Unknown Place",
+                    location: item.location || { lat:0, lng:0 }, // Ensure location is present
+                    place_id: item.id || item.place_id || `fallback-${index}-${item.name}`, // Ensure place_id for key
+                    // Pass other LocationDetail fields if needed by HorizontalScrollBar card rendering,
+                    // though it primarily uses name for display and image from the separate 'images' prop.
+                    // photo_urls: item.photo_urls, // Pass if HSB needs to make decisions based on it
+                }))}
+                images={imagesForScroll}
+                scrollButton={{ route: section.scrollButtonKey, loading: section.loading }}
                 handleNavigation={handleNavigation}
               />
             );

@@ -1,19 +1,20 @@
 "use client";
 
-import { LocationDetail } from "@/types/location-types"; // Assuming this path and type are correct for web
-import React from "react";
+import { LocationDetail } from "@/types/location-types";
+import React, { useRef, useState, useEffect, useCallback } from "react"; // Added useRef, useState, useEffect, useCallback
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Added Chevron icons
 
 interface ScrollButton {
-  route: string; // Should align with Next.js routes or RouteKey type if that's what handleNavigation expects
+  route: string;
   loading: boolean;
 }
 
 interface HorizontalScrollBarProps {
   title: string;
-  cardData: LocationDetail[]; // Ensure LocationDetail matches what HomeScreen provides
+  cardData: LocationDetail[];
   scrollButton: ScrollButton;
-  handleNavigation: (route: string) => void; // Or (route: RouteKey) if it expects a key
+  handleNavigation: (route: string) => void;
   images: string[];
 }
 
@@ -24,46 +25,115 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
   handleNavigation,
   images,
 }) => {
-  console.log(`HorizontalScrollBar ("${title}"): Received cardData:`, cardData);
-  console.log(`HorizontalScrollBar ("${title}"): Received images:`, images);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // console.log(`HorizontalScrollBar ("${title}"): Received cardData:`, cardData);
+  // console.log(`HorizontalScrollBar ("${title}"): Received images:`, images);
+
+  const updateScrollButtonState = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 5); // Allow a small tolerance
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5); // Allow a small tolerance
+    }
+  }, []); // No dependencies, relies on ref.current
+
+  useEffect(() => {
+    const scrollElement = scrollContainerRef.current;
+    if (scrollElement) {
+      updateScrollButtonState(); // Initial check
+
+      scrollElement.addEventListener('scroll', updateScrollButtonState);
+
+      const resizeObserver = new ResizeObserver(updateScrollButtonState);
+      resizeObserver.observe(scrollElement);
+
+      // Also update on cardData change, as this can change scrollWidth
+      // This is especially true if cardData starts empty and then loads
+      const mutationObserver = new MutationObserver(updateScrollButtonState);
+      mutationObserver.observe(scrollElement, { childList: true, subtree: true });
+
+
+      return () => {
+        scrollElement.removeEventListener('scroll', updateScrollButtonState);
+        resizeObserver.unobserve(scrollElement);
+        mutationObserver.disconnect();
+      };
+    }
+  }, [cardData, updateScrollButtonState]); // updateScrollButtonState is memoized by useCallback
+
+  const handleScrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 relative group/scrollbar"> {/* Added relative and group for potential absolute positioning of buttons if chosen */}
       <div className="flex flex-row justify-between items-center mb-3">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h2>
-        <button
-          onClick={() => handleNavigation(scrollButton.route)}
-          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
-        >
-          See all
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleScrollLeft}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+            className="p-1.5 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={handleScrollRight}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+            className="p-1.5 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+          >
+            <ChevronRight size={20} />
+          </button>
+          <button
+            onClick={() => handleNavigation(scrollButton.route)}
+            className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors text-sm font-medium py-1 px-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+          >
+            See all
+          </button>
+        </div>
       </div>
       {scrollButton.loading ? (
         <p className="my-4 text-center text-gray-600 dark:text-gray-400">Loading...</p>
       ) : (
-        <div className="flex overflow-x-auto space-x-4 pb-2 -mx-1 px-1">
+        <div
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto space-x-4 pb-2 -mx-1 px-1 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 dark:scrollbar-thumb-slate-700 dark:hover:scrollbar-thumb-slate-600"
+          style={{ scrollbarWidth: 'thin' }} // For Firefox
+        >
           {cardData.length === 0 && !scrollButton.loading && (
-            <p className="text-gray-500 dark:text-gray-400">No items to display currently.</p>
+            <p className="text-gray-500 dark:text-gray-400 whitespace-nowrap">No items to display currently.</p>
           )}
           {cardData.map((item, index) => {
             const imagePath = images[index % images.length];
-            console.log(`HorizontalScrollBar ("${title}"): Rendering card for item:`, item, "with imagePath:", imagePath);
+            // console.log(`HorizontalScrollBar ("${title}"): Rendering card for item:`, item, "with imagePath:", imagePath);
             return (
               <div
-                key={item.place_id || `${item.name}-${index}`} // Use place_id if available, fallback
+                key={item.place_id || `${item.name}-${index}`}
                 onClick={() => {
-                  // TODO: Implement individual card click navigation if desired
-                  // e.g., if item has a specific route or ID for a detail page
                   console.log("Card clicked:", item.name);
                 }}
-                className="group relative w-52 h-36 rounded-xl overflow-hidden shadow-lg cursor-pointer"
+                className="group relative min-w-[208px] h-36 rounded-xl overflow-hidden shadow-lg cursor-pointer" // Changed w-52 to min-w-[208px]
               >
                 <Image
-                  src={imagePath}
+                  src={imagePath || '/assets/images/default-placeholder.png'} // Fallback for imagePath itself
                   alt={item.name}
                   layout="fill"
                   objectFit="cover"
                   className="transition-transform duration-300 group-hover:scale-110"
+                  onError={(e) => { e.currentTarget.src = '/assets/images/default-placeholder.png'; }} // Handle broken image links
                 />
                 {/* TODO: Review card overlay (bg-black/40) in dark mode for readability if needed. */}
                 <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:bg-black/50" />
@@ -87,8 +157,14 @@ export default HorizontalScrollBar;
 // 1. Assumed `LocationDetail` contains `name` and `location: { lat, lng }`. Also place_id for keys.
 // 2. `images` prop should now be an array of string paths accessible from the web.
 // 3. Individual card click action is currently a console log.
-// 4. Tailwind classes like `w-52 h-36` and `space-x-4` are used for sizing and spacing.
+// 4. Card width changed to min-w-[208px] (13rem, equivalent to w-52).
 // 5. Added a message for when cardData is empty but not loading.
 // 6. The `scrollButton.route` should be a valid Next.js path or a RouteKey if handleNavigation expects that.
 // 7. Improved styling for "See all" button and card appearance.
-// Note: Lines 8 and 9 from the previous "Notes" section, and any trailing markdown fence, have been removed.
+// 8. Added `pb-2 -mx-1 px-1` to the scrolling container.
+// 9. Card overlay (bg-black/40) might need review in dark mode.
+// 10. Added Next/Previous scroll buttons with visibility logic.
+// 11. Added scrollbar styling utility classes (scrollbar-thin, etc.) - may require a plugin like tailwind-scrollbar.
+// 12. Added onError handler to Next/Image for broken links.
+// 13. Wrapped updateScrollButtonState in useCallback and added MutationObserver for robustness.
+```
