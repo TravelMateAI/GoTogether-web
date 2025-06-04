@@ -7,7 +7,10 @@ const nextConfig = {
   },
   serverExternalPackages: ["@node-rs/argon2"],
   images: {
-    domains: ['i.pravatar.cc'], // ✅ allow this domain
+    domains: [
+      "i.pravatar.cc",
+      "lh3.googleusercontent.com", // ✅ added this domain
+    ],
     remotePatterns: [
       {
         protocol: "https",
@@ -15,10 +18,10 @@ const nextConfig = {
         pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
       },
       {
-        protocol: 'https',
-        hostname: 'maps.googleapis.com',
-        port: '',
-        pathname: '/maps/api/place/photo/**',
+        protocol: "https",
+        hostname: "maps.googleapis.com",
+        port: "",
+        pathname: "/maps/api/place/photo/**",
       },
     ],
   },
