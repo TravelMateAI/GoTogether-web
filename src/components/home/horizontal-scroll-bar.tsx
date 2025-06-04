@@ -91,6 +91,4 @@ export default HorizontalScrollBar;
 // 5. Added a message for when cardData is empty but not loading.
 // 6. The `scrollButton.route` should be a valid Next.js path or a RouteKey if handleNavigation expects that.
 // 7. Improved styling for "See all" button and card appearance.
-// 8. Added `pb-2 -mx-1 px-1` to the scrolling container.
-// 9. Card overlay (bg-black/40) might need review in dark mode.
-```
+// Note: Lines 8 and 9 from the previous "Notes" section, and any trailing markdown fence, have been removed.
