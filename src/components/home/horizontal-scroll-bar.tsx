@@ -165,6 +165,4 @@ export default HorizontalScrollBar;
 // 9. Card overlay (bg-black/40) might need review in dark mode.
 // 10. Added Next/Previous scroll buttons with visibility logic.
 // 11. Added scrollbar styling utility classes (scrollbar-thin, etc.) - may require a plugin like tailwind-scrollbar.
-// 12. Added onError handler to Next/Image for broken links.
-// 13. Wrapped updateScrollButtonState in useCallback and added MutationObserver for robustness.
-```
+// Note: Extraneous comment lines and any trailing markdown fence removed.
