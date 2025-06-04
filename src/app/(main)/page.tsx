@@ -43,8 +43,8 @@ export const ROUTES = {
   LANGUAGE: "/home/language",
   NEARBY: "/home/nearby",
   STAY: "/home/stay",
-  "TOP PICKS": "/home/top-picks",
-  EMERGENCY: "/emergency", // Assuming emergency is a top-level route now
+  TOP_PICKS: "/home/top-picks", // Changed "TOP PICKS" to TOP_PICKS
+  EMERGENCY: "/emergency",
   PLANNER: "/planner",
 } as const;
 
@@ -101,7 +101,14 @@ export default function HomeScreen() {
   }, []);
 
   const handleNavigation = (routeKey: RouteKey) => {
-    router.push(ROUTES[routeKey]);
+    console.log("Navigating with routeKey:", routeKey);
+    const path = ROUTES[routeKey];
+    console.log("Resolved path:", path);
+    if (path) {
+      router.push(path);
+    } else {
+      console.error("Error: Invalid routeKey or path not found in ROUTES:", routeKey);
+    }
   };
 
   const handleExternalLink = (url: string) => {
@@ -114,7 +121,7 @@ export default function HomeScreen() {
     { title: "Culture", icon: "[ICON: TreePalm]", color: "text-yellow-500", onPress: () => handleNavigation("CULTURE") },
     { title: "Entertainment", icon: "[ICON: Film]", color: "text-green-500", onPress: () => handleNavigation("ENTERTAINMENT") },
     { title: "Nearby", icon: "[ICON: MapPin]", color: "text-teal-500", onPress: () => handleNavigation("NEARBY") },
-    { title: "Top Picks", icon: "[ICON: FerrisWheel]", color: "text-blue-500", onPress: () => handleNavigation("TOP PICKS") },
+    { title: "Top Picks", icon: "[ICON: FerrisWheel]", color: "text-blue-500", onPress: () => handleNavigation("TOP_PICKS") }, // Changed to TOP_PICKS
     { title: "Emergency", icon: "[ICON: Briefcase]", color: "text-purple-500", onPress: () => handleNavigation("EMERGENCY") },
     { title: "Planner", icon: "[ICON: ShoppingBag]", color: "text-pink-500", onPress: () => handleNavigation("PLANNER") },
   ];
@@ -122,9 +129,9 @@ export default function HomeScreen() {
   // Mock data for image paths - assuming they are moved to public/assets/images/
   // These structures are primarily for fallback if API fails or for providing image URLs
   const topPicksImagesData = [
-    { id: "tp1", name: "Beach Paradise", image: "/assets/images/top-picks/img1.jpg", description: "Sun, sand, and sea.", location: { lat: 0, lng: 0 }, category: "Nature", route: "TOP PICKS" as RouteKey },
-    { id: "tp2", name: "Mountain Hike", image: "/assets/images/top-picks/img2.jpg", description: "Breathtaking views await.", location: { lat: 0, lng: 0 }, category: "Adventure", route: "TOP PICKS" as RouteKey },
-    { id: "tp3", name: "City Exploration", image: "/assets/images/top-picks/img3.jpg", description: "Discover urban wonders.", location: { lat: 0, lng: 0 }, category: "Urban", route: "TOP PICKS" as RouteKey },
+    { id: "tp1", name: "Beach Paradise", image: "/assets/images/top-picks/img1.jpg", description: "Sun, sand, and sea.", location: { lat: 0, lng: 0 }, category: "Nature", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
+    { id: "tp2", name: "Mountain Hike", image: "/assets/images/top-picks/img2.jpg", description: "Breathtaking views await.", location: { lat: 0, lng: 0 }, category: "Adventure", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
+    { id: "tp3", name: "City Exploration", image: "/assets/images/top-picks/img3.jpg", description: "Discover urban wonders.", location: { lat: 0, lng: 0 }, category: "Urban", route: "TOP_PICKS" as RouteKey }, // Changed to TOP_PICKS
   ];
 
   const entertainmentImagesData = [
@@ -145,7 +152,7 @@ export default function HomeScreen() {
       loading: loadingTopPicks,
       apiData: topPicks,
       fallbackData: topPicksImagesData,
-      scrollButtonRoute: ROUTES["TOP PICKS"]
+      scrollButtonKey: "TOP_PICKS" as RouteKey // Changed to scrollButtonKey and RouteKey
     },
     {
       title: "🎬 Entertainment Hotspots",
@@ -153,7 +160,7 @@ export default function HomeScreen() {
       loading: loadingEntertainment,
       apiData: entertainment,
       fallbackData: entertainmentImagesData,
-      scrollButtonRoute: ROUTES.ENTERTAINMENT
+      scrollButtonKey: "ENTERTAINMENT" as RouteKey // Changed to scrollButtonKey and RouteKey
     },
     {
       title: "🏛️ Cultural Experiences",
@@ -161,7 +168,7 @@ export default function HomeScreen() {
       loading: loadingCulture,
       apiData: culture,
       fallbackData: cultureImagesData,
-      scrollButtonRoute: ROUTES.CULTURE
+      scrollButtonKey: "CULTURE" as RouteKey // Changed to scrollButtonKey and RouteKey
     }
   ];
 
@@ -231,7 +238,7 @@ export default function HomeScreen() {
                 // The 'images' prop for HorizontalScrollBar expects string[] for background cycling
                 // We'll derive this from the fallbackData, assuming each item has an 'image' field.
                 images={section.fallbackData.map(item => item.image)}
-                scrollButton={{ route: section.scrollButtonRoute, loading: section.loading }}
+                scrollButton={{ route: section.scrollButtonKey, loading: section.loading }} // Pass RouteKey here
                 handleNavigation={handleNavigation}
               />
             );
