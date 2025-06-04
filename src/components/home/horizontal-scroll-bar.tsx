@@ -125,7 +125,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({
                 onClick={() => {
                   console.log("Card clicked:", item.name);
                 }}
-                className="group relative min-w-[208px] h-36 rounded-xl overflow-hidden shadow-lg cursor-pointer" // Changed w-52 to min-w-[208px]
+                className="group relative h-36 overflow-hidden rounded-xl shadow-lg cursor-pointer w-[calc(50%-0.5rem)] sm:w-[calc(100%/3-0.75rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(100%/6-0.833rem)] flex-shrink-0"
               >
                 <Image
                   src={imagePath || '/assets/images/default-placeholder.png'} // Fallback for imagePath itself
@@ -157,7 +157,7 @@ export default HorizontalScrollBar;
 // 1. Assumed `LocationDetail` contains `name` and `location: { lat, lng }`. Also place_id for keys.
 // 2. `images` prop should now be an array of string paths accessible from the web.
 // 3. Individual card click action is currently a console log.
-// 4. Card width changed to min-w-[208px] (13rem, equivalent to w-52).
+// 4. Card widths are now responsive using calc() for various breakpoints. Added flex-shrink-0 to cards.
 // 5. Added a message for when cardData is empty but not loading.
 // 6. The `scrollButton.route` should be a valid Next.js path or a RouteKey if handleNavigation expects that.
 // 7. Improved styling for "See all" button and card appearance.
