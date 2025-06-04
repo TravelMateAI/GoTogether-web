@@ -1,7 +1,7 @@
 "use server";
 
-import { goKyInstance } from "@/lib/ky"; // Assuming '@/' alias is configured for 'src/'
-import { LocationDetail } from "@/types/location-types"; // Assuming '@/' alias
+import { goKyInstance } from "../../../lib/ky"; // Corrected relative path
+import { LocationDetail } from "@/types/location-types"; // Assuming '@/' alias for types is correct
 
 // Interface for the action's return value
 interface GetNearbyPlacesResult {
