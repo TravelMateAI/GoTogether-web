@@ -1,12 +1,20 @@
 "use server";
 
 import { goKyInstance } from "../../../lib/ky"; // Corrected relative path
-import { LocationDetail } from "@/types/location-types"; // Assuming '@/' alias for types is correct
+import { LocationDetail } from "@/types/location-types"; // Assuming '@/' alias for types is correct, will be updated later if needed
 
-// Interface for the action's return value
+// Interface for the Go backend's expected API response structure
+interface GoPlacesApiResponse {
+  results: LocationDetail[]; // This LocationDetail will be updated to GoLocationDetail in a subsequent step
+  status: string;
+  error_message?: string; // Optional field for more specific API errors
+  // next_page_token?: string; // Optional for pagination
+}
+
+// Interface for the action's return value - remains the same
 interface GetNearbyPlacesResult {
   success: boolean;
-  data?: LocationDetail[];
+  data?: LocationDetail[]; // This LocationDetail will be updated to GoLocationDetail
   error?: string;
   // nextPageToken?: string; // TODO: Add if pagination is supported and needed
 }
@@ -38,27 +46,35 @@ export async function getNearbyPlacesAction(
     // that can be typed as LocationDetail[] or an object containing it (e.g., { results: LocationDetail[], nextPageToken?: string })
     // For now, let's assume it returns LocationDetail[] directly for simplicity.
     // If it returns an object like { results: LocationDetail[], nextPageToken: "..." }, update .json<TYPE>() accordingly.
-    const responseData = await goKyInstance.get("maps/places", {
+    const apiResponse = await goKyInstance.get("maps/places", {
       searchParams: searchParams,
       // Does your Go backend handle the Google Maps API key, or does it need to be passed from the client/action?
       // Assuming the Go backend securely manages the API key.
-    }).json<LocationDetail[]>(); // Or .json<{ results: LocationDetail[], nextPageToken?: string }>();
+    }).json<GoPlacesApiResponse>();
 
-    // If your API returns { results: LocationDetail[], nextPageToken: "..." }
-    // const data = responseData.results;
-    // const nextPageToken = responseData.nextPageToken;
-    // return { success: true, data, nextPageToken };
-
-    return { success: true, data: responseData };
+    // Check the status from the Go backend's response
+    if (apiResponse.status === "OK" || apiResponse.status === "ZERO_RESULTS") {
+      // Even if ZERO_RESULTS, the call was successful, data will be an empty array.
+      return { success: true, data: apiResponse.results };
+    } else {
+      // Handle other statuses like "REQUEST_DENIED", "INVALID_REQUEST", "OVER_QUERY_LIMIT", "UNKNOWN_ERROR"
+      console.error(`API returned error status: ${apiResponse.status} - ${apiResponse.error_message || ''}`);
+      return { success: false, error: apiResponse.error_message || `API Error: ${apiResponse.status}` };
+    }
 
   } catch (error: any) {
     console.error("Error in getNearbyPlacesAction:", error);
-    // Ky errors often have a `response` object with more details
-    if (error.response) {
-      const errorBody = await error.response.text();
-      console.error("Error response body:", errorBody);
-      return { success: false, error: `API error: ${error.message} - ${errorBody}` };
+    let errorMessage = "Failed to fetch nearby places.";
+    if (error.name === 'HTTPError') { // Ky specific HTTP error
+        try {
+            const errorResponse = await error.response.json();
+            errorMessage = `API Error: ${errorResponse.status || error.response.status} - ${errorResponse.error_message || errorResponse.error || error.message}`;
+        } catch (e) {
+            errorMessage = `API Error: ${error.response.status} - ${error.message}`;
+        }
+    } else if (error instanceof Error) {
+        errorMessage = error.message;
     }
-    return { success: false, error: error.message || "Failed to fetch nearby places." };
+    return { success: false, error: errorMessage };
   }
 }
