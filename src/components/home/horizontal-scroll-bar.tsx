@@ -90,6 +90,3 @@ export default HorizontalScrollBar;
 // 6. The `scrollButton.route` should be a valid Next.js path.
 // 7. Improved styling for "See all" button and card appearance.
 // 8. Added `pb-2 -mx-1 px-1` to the scrolling container to better manage padding with `space-x-4` and potential scrollbars.
-// 9. Changed card dimensions to `w-52 h-36` for a slightly different aspect ratio, can be adjusted.
-// 10. The `group` class from Tailwind is used for hover effects on the overlay.
-```
