@@ -2,9 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Briefcase } from "lucide-react";
-// TODO: Replace other text icons like "[ICON: BedDouble]" with actual SVG icons from Lucide or Heroicons.
-// import { MapPin, BedDouble, Utensils, TreePalm, Film, FerrisWheel, ShoppingBag } from 'lucide-react';
+import {
+  Search,
+  Briefcase,
+  BedDouble,
+  Utensils,
+  TreePalm,
+  Film,
+  MapPin,
+  FerrisWheel,
+  Siren,
+  ListChecks
+} from "lucide-react";
 
 // Assuming getHiddenLocations is adapted for web (e.g., uses fetch)
 // import { getHiddenLocations } from "@/services/location-service";
@@ -115,15 +124,17 @@ export default function HomeScreen() {
     window.open(url, "_blank", "noopener noreferrer");
   };
 
+  const iconSize = 28; // Consistent size for feature icons
+
   const cardButtons = [
-    { title: "Stay", icon: "[ICON: BedDouble]", color: "text-red-500", onPress: () => handleNavigation("STAY") },
-    { title: "Food", icon: "[ICON: Utensils]", color: "text-orange-500", onPress: () => handleNavigation("FOOD") },
-    { title: "Culture", icon: "[ICON: TreePalm]", color: "text-yellow-500", onPress: () => handleNavigation("CULTURE") },
-    { title: "Entertainment", icon: "[ICON: Film]", color: "text-green-500", onPress: () => handleNavigation("ENTERTAINMENT") },
-    { title: "Nearby", icon: "[ICON: MapPin]", color: "text-teal-500", onPress: () => handleNavigation("NEARBY") },
-    { title: "Top Picks", icon: "[ICON: FerrisWheel]", color: "text-blue-500", onPress: () => handleNavigation("TOP_PICKS") }, // Changed to TOP_PICKS
-    { title: "Emergency", icon: "[ICON: Briefcase]", color: "text-purple-500", onPress: () => handleNavigation("EMERGENCY") },
-    { title: "Planner", icon: "[ICON: ShoppingBag]", color: "text-pink-500", onPress: () => handleNavigation("PLANNER") },
+    { title: "Stay", icon: <BedDouble size={iconSize} />, color: "text-red-500", onPress: () => handleNavigation("STAY") },
+    { title: "Food", icon: <Utensils size={iconSize} />, color: "text-orange-500", onPress: () => handleNavigation("FOOD") },
+    { title: "Culture", icon: <TreePalm size={iconSize} />, color: "text-yellow-500", onPress: () => handleNavigation("CULTURE") },
+    { title: "Entertainment", icon: <Film size={iconSize} />, color: "text-green-500", onPress: () => handleNavigation("ENTERTAINMENT") },
+    { title: "Nearby", icon: <MapPin size={iconSize} />, color: "text-teal-500", onPress: () => handleNavigation("NEARBY") },
+    { title: "Top Picks", icon: <FerrisWheel size={iconSize} />, color: "text-blue-500", onPress: () => handleNavigation("TOP_PICKS") },
+    { title: "Emergency", icon: <Siren size={iconSize} />, color: "text-purple-500", onPress: () => handleNavigation("EMERGENCY") }, // Changed Briefcase to Siren for Emergency
+    { title: "Planner", icon: <ListChecks size={iconSize} />, color: "text-pink-500", onPress: () => handleNavigation("PLANNER") }, // Changed ShoppingBag to ListChecks for Planner
   ];
 
   // Mock data for image paths - assuming they are moved to public/assets/images/
@@ -212,7 +223,8 @@ export default function HomeScreen() {
                   onClick={button.onPress}
                   className={`flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg dark:hover:shadow-slate-700/50 transition-shadow aspect-square`}
                 >
-                  <span className={`text-3xl ${button.color}`}>{button.icon}</span> {/* Icon placeholder - specific colors remain */}
+                  {/* The 'icon' is now a component, color class is applied to the span wrapping it */}
+                  <span className={`text-3xl ${button.color}`}>{button.icon}</span>
                   <span className="mt-1 text-xs font-medium text-center text-gray-700 dark:text-gray-300">{button.title}</span>
                 </button>
               ))}
