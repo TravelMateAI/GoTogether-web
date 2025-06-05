@@ -41,6 +41,7 @@ export default async function RootLayout({
   // This handles cases where this RootLayout might be used directly by a locale-specific route segment.
   // However, with `localePrefix: 'as-needed'` and middleware, `getLocale()` should be reliable.
   const locale = params?.locale || await getLocale();
+  console.log("RootLayout - Determined locale:", locale); // Added console.log
   const messages = await getMessages(); // Uses the locale from getRequestConfig in i18n.ts
 
   return (

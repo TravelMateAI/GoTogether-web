@@ -10,14 +10,5 @@ const intlMiddleware = createMiddleware({
 export default intlMiddleware;
 
 export const config = {
-  // Match only internationalized pathnames
-  matcher: [
-    '/', // Root
-    '/(en|es)/:path*', // Locale-specific paths
-    // Add paths that should not be internationalized if needed,
-    // e.g., '/api/:path*', '/_next/:path*', '/img/:path*', '/favicon.ico'
-    // but for now, this covers root and locale-prefixed paths.
-    // A common pattern to exclude static assets and API routes:
-    // '/((?!api|_next/static|_next/image|assets|favicon.ico).*)'
-  ]
+  matcher: ['/((?!api|_next/static|_next/image|assets|favicon.ico).*)']
 };
