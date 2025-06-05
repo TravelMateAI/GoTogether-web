@@ -96,12 +96,14 @@ const HorizontalScrollBar = (
               className="text-gray-700 dark:text-gray-300"
             />
           </button>
-          <button
-            onClick={() => handleNavigation(scrollButton.route)}
-            className="rounded-md px-2 py-1 text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 dark:focus:ring-indigo-600"
-          >
-            See all
-          </button>
+          {scrollButton && scrollButton.route && scrollButton.route.trim() !== "" && (
+            <button
+              onClick={() => handleNavigation(scrollButton.route)}
+              className="rounded-md px-2 py-1 text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 dark:focus:ring-indigo-600"
+            >
+              See all
+            </button>
+          )}
         </div>
       </div>
 

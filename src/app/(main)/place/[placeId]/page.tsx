@@ -15,11 +15,13 @@ import {
   Navigation, // For directions link
   Loader2,    // For loading states
   MapPinned,  // Icon for Get Directions button
+  ListTree,   // Icon for Related Places
 } from "lucide-react";
 import ClientImage from "@/components/shared/ClientImage";
-import { getPlaceDetailsByIdAction } from "./actions"; // Corrected import path
+import { getPlaceDetailsByIdAction, getNearbyPlacesAction } from "./actions"; // Corrected import path, added getNearbyPlacesAction
 import { getDirectionsAction, GoogleDirectionsResponse } from "../../actions"; // This one should be correct for the main actions file
 import type { PlaceDetails } from "../../../../types/location-types"; // Path to existing type
+import HorizontalScrollBar from "@/components/home/horizontal-scroll-bar"; // Import HorizontalScrollBar
 
 // StarRating component remains the same
 const StarRating = ({
@@ -69,6 +71,11 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
   const [isLoadingDirections, setIsLoadingDirections] = useState(false);
   const [originForDirectionsLink, setOriginForDirectionsLink] = useState<string>("");
 
+  // State for related places
+  const [relatedPlaces, setRelatedPlaces] = useState<PlaceDetails[]>([]);
+  const [isLoadingRelatedPlaces, setIsLoadingRelatedPlaces] = useState(true);
+  const [relatedPlacesError, setRelatedPlacesError] = useState<string | null>(null);
+
   useEffect(() => {
     if (placeId) {
       startTransition(() => {
@@ -87,6 +94,43 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
       });
     }
   }, [placeId]);
+
+  // useEffect for Related Places
+  useEffect(() => {
+    if (place?.geometry?.location) {
+      startTransition(() => {
+        setIsLoadingRelatedPlaces(true);
+        setRelatedPlacesError(null);
+      });
+
+      const locationStr = `${place.geometry.location.lat},${place.geometry.location.lng}`;
+      // Use the first type of the current place as the primary type for related search
+      const primaryType = place.types && place.types.length > 0 ? place.types[0] : "point_of_interest";
+      const queryTypesArray = typeof primaryType === 'string' ? [primaryType] : ["point_of_interest"];
+      const radius = 10000; // Increased radius for more related places
+
+      getNearbyPlacesAction(locationStr, queryTypesArray, radius)
+        .then(result => {
+          startTransition(() => {
+            if (result.success && result.data) {
+              const filteredResults = result.data.filter(p => p.place_id !== place.place_id).slice(0, 10);
+              setRelatedPlaces(filteredResults as PlaceDetails[]); // Cast if LocationDetail is returned by getNearbyPlacesAction
+            } else {
+              setRelatedPlacesError(result.error || "Could not load related places.");
+            }
+            setIsLoadingRelatedPlaces(false);
+          });
+        })
+        .catch(err => {
+          startTransition(() => {
+            console.error("Error fetching related places:", err);
+            setRelatedPlacesError("An unexpected error occurred while fetching related places.");
+            setIsLoadingRelatedPlaces(false);
+          });
+        });
+    }
+  }, [place]); // Dependency: run when 'place' details are loaded/changed
+
 
   const handleGetDirections = async () => {
     if (!place || (!place.formatted_address && !place.name)) {
@@ -317,6 +361,50 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* Related Places Section */}
+            {isLoadingRelatedPlaces && (
+              <section className="mt-6 rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
+                <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                  <ListTree size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> You Might Also Like
+                </h2>
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 size={32} className="animate-spin text-indigo-600" />
+                  <p className="ml-3 text-gray-700 dark:text-gray-300">Loading related places...</p>
+                </div>
+              </section>
+            )}
+            {relatedPlacesError && (
+              <section className="mt-6 rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
+                 <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                  <ListTree size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> You Might Also Like
+                </h2>
+                <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/30">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-red-800 dark:text-red-300">{relatedPlacesError}</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+            {place && relatedPlaces.length > 0 && !isLoadingRelatedPlaces && !relatedPlacesError && (
+              <section className="mt-6 rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
+                <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                  <ListTree size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> You Might Also Like
+                </h2>
+                <HorizontalScrollBar
+                  title="" // Title is handled by the h2 above
+                  cardData={relatedPlaces} // relatedPlaces are PlaceDetails[], compatible with LocationDetail[]
+                  images={relatedPlaces.map(p => p.photo_urls?.[0] || DEFAULT_IMAGE_URL)}
+                  scrollButton={{ route: "" as any, loading: false }} // Effectively hides "See all"
+                  handleNavigation={() => {}} // Dummy function as "See all" is hidden
+                />
               </section>
             )}
           </div>
