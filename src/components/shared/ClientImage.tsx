@@ -12,6 +12,7 @@ interface ClientImageProps {
   priority?: boolean;
   className?: string;
   objectFit?: "cover" | "contain" | "fill";
+  sizes?: string; // Added sizes prop
 }
 
 export default function ClientImage({
@@ -23,6 +24,7 @@ export default function ClientImage({
   priority = false,
   className,
   objectFit = "cover",
+  sizes, // Added sizes to destructuring
 }: ClientImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
 
@@ -42,6 +44,7 @@ export default function ClientImage({
       onError={handleError}
       className={className}
       style={{ objectFit }}
+      sizes={sizes} // Passed sizes to Image component
     />
   );
 }

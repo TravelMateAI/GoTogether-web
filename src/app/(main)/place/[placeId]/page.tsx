@@ -164,7 +164,14 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
     <div className="min-h-screen bg-gray-100 dark:bg-slate-900">
       {place.photo_urls && place.photo_urls.length > 0 ? (
         <div className="relative h-64 w-full overflow-hidden shadow-lg sm:h-80 md:h-96">
-          <ClientImage src={place.photo_urls[0]} alt={`Image of ${place.name}`} fill objectFit="cover" priority />
+          <ClientImage
+            src={place.photo_urls[0]}
+            alt={`Image of ${place.name}`}
+            fill
+            objectFit="cover"
+            priority
+            sizes="100vw"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           <h1 className="absolute bottom-0 left-0 p-4 text-3xl font-bold text-white drop-shadow-xl sm:p-8 sm:text-4xl lg:text-5xl">
             {place.name}
@@ -296,7 +303,19 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
                 <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">Photo Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4"> {/* Removed md:grid-cols-4 */}
-                  {place.photo_urls.slice(1, 7).map((url, index) => (<div key={index} className="relative aspect-square overflow-hidden rounded-lg"><ClientImage src={url} alt={`${place.name} photo ${index + 1}`} fill objectFit="cover" className="transition-transform duration-200 hover:scale-105" priority /></div>))}
+                  {place.photo_urls.slice(1, 7).map((url, index) => (
+                    <div key={index} className="relative aspect-square overflow-hidden rounded-lg">
+                      <ClientImage
+                        src={url}
+                        alt={`${place.name} photo ${index + 1}`}
+                        fill
+                        objectFit="cover"
+                        className="transition-transform duration-200 hover:scale-105"
+                        priority // Consider if all these thumbnails need priority
+                        sizes="(max-width: 639px) 45vw, 30vw"
+                      />
+                    </div>
+                  ))}
                 </div>
               </section>
             )}
