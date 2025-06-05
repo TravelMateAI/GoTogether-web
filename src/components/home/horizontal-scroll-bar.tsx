@@ -70,7 +70,7 @@ const HorizontalScrollBar = (
   return (
     <div className="mb-8">
       <div className="mb-3 flex flex-row items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100"> {/* Changed font-bold to font-semibold */}
           {title}
         </h2>
         <div className="flex items-center space-x-2">

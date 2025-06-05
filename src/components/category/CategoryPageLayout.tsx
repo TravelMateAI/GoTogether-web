@@ -6,7 +6,7 @@
     import { getNearbyPlacesAction, getAiSummaryAction } from "@/app/(main)/actions"; // Added getAiSummaryAction
     import type { LocationDetail } from "@/types/location-types";
     import PlaceCard from "@/components/home/PlaceCard";
-    import { AlertCircle, Loader2 } from "lucide-react";
+    import { AlertCircle, Loader2, Lightbulb, SearchX } from "lucide-react"; // Added Lightbulb, SearchX
 
     const DEFAULT_IMAGE_URL = "/assets/images/default-placeholder.png";
 
@@ -107,12 +107,13 @@
           </header>
 
           {/* AI Summary Display Section */}
-          {isLoadingAiSummary && <p className="text-sm text-gray-500 dark:text-gray-400 my-3 p-3 bg-white dark:bg-slate-800 rounded-lg shadow">Fetching AI tip...</p>}
-          {aiSummaryError && <p className="text-sm text-red-500 dark:text-red-400 my-3 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 rounded-lg shadow">AI Tip Error: {aiSummaryError}</p>}
-          {aiSummary && !aiSummaryError && ( // Ensure no error is shown when summary is present
-            <div className="my-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm dark:bg-indigo-900/40 dark:border-indigo-700">
+          {isLoadingAiSummary && <p className="text-sm text-gray-500 dark:text-gray-400 my-6 p-4 bg-white dark:bg-slate-800 rounded-lg shadow">Fetching AI tip...</p>}
+          {aiSummaryError && <p className="text-sm text-red-500 dark:text-red-400 my-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 rounded-lg shadow">AI Tip Error: {aiSummaryError}</p>}
+          {aiSummary && !aiSummaryError && (
+            <div className="my-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm dark:bg-indigo-900/30 dark:border-indigo-700 flex items-center">
+              <Lightbulb size={20} className="flex-shrink-0 mr-3 text-indigo-600 dark:text-indigo-400" />
               <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                <strong className="font-semibold">💡 AI Tip:</strong> {aiSummary}
+                <span className="font-semibold">AI Tip:</span> {aiSummary}
               </p>
             </div>
           )}
@@ -137,9 +138,12 @@
           )}
 
           {!loading && !error && places.length === 0 && (
-            <p className="py-10 text-center text-lg text-gray-500 dark:text-gray-400">
-              No {title.toLowerCase()} found for the current location. Try exploring a different area.
-            </p>
+            <div className="py-10 text-center flex flex-col items-center justify-center">
+              <SearchX size={48} className="mb-3 text-gray-400 dark:text-gray-500" />
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                No {title.toLowerCase()} found for the current location. Try exploring a different area.
+              </p>
+            </div>
           )}
 
           {!loading && !error && places.length > 0 && (

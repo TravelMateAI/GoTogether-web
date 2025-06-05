@@ -219,10 +219,10 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
               <button
                 onClick={handleGetDirections}
                 disabled={isLoadingDirections || !place}
-                className="mb-4 flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white shadow transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="mb-4 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isLoadingDirections ? (
-                  <> <Loader2 size={20} className="mr-2 animate-spin" /> Loading Directions... </>
+                  <> <Loader2 size={20} className="mr-2 animate-spin" /> Loading... </>
                 ) : ( "Get Directions From My Location" )}
               </button>
 
@@ -295,7 +295,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
             {place.photo_urls && place.photo_urls.length > 1 && (
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
                 <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">Photo Gallery</h2>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4"> {/* Removed md:grid-cols-4 */}
                   {place.photo_urls.slice(1, 7).map((url, index) => (<div key={index} className="relative aspect-square overflow-hidden rounded-lg"><ClientImage src={url} alt={`${place.name} photo ${index + 1}`} fill objectFit="cover" className="transition-transform duration-200 hover:scale-105" priority /></div>))}
                 </div>
               </section>

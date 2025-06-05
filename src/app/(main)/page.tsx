@@ -213,7 +213,7 @@ export default function HomeScreen() {
           )}
           {!isGeocoding && !geocodingError && geocodedResults.length > 0 && (
             <div className="my-4 p-4 bg-white dark:bg-slate-800 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Geocoding Results:</h3>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">Geocoding Results:</h3> {/* Updated classes */}
               <ul className="space-y-2">
                 {geocodedResults.map((result) => (
                   <li key={result.place_id} className="text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-700 pb-1 last:border-b-0">
@@ -239,7 +239,7 @@ export default function HomeScreen() {
         </div>
 
         <main className="p-5 pt-0"> {/* Adjusted padding top to 0 as results section above has padding */}
-          <section className="mb-6">
+          <section className="mt-6 mb-6"> {/* Added mt-6 */}
             <div className="grid grid-cols-4 gap-3">
               {cardButtons.map((button) => (
                 <button
@@ -248,7 +248,7 @@ export default function HomeScreen() {
                   className={`flex aspect-square flex-col items-center justify-center rounded-lg bg-white p-2 shadow transition-shadow hover:shadow-lg dark:bg-slate-800 dark:hover:shadow-slate-700/50`}
                 >
                   <span className={`text-3xl ${button.color}`}>{button.icon}</span>
-                  <span className="mt-1 text-center text-xs font-medium text-gray-700 dark:text-gray-300">{button.title}</span>
+                  <span className="mt-1 text-center text-sm font-medium text-gray-700 dark:text-gray-300">{button.title}</span> {/* Changed text-xs to text-sm */}
                 </button>
               ))}
             </div>
@@ -271,18 +271,19 @@ export default function HomeScreen() {
             }));
 
             return (
-              <HorizontalScrollBar
-                key={sectionConfig.id}
-                title={t(sectionConfig.titleKey)}
+              <div key={sectionConfig.id} className="mb-6"> {/* Added wrapper div with mb-6 */}
+                <HorizontalScrollBar
+                  title={t(sectionConfig.titleKey)}
                 cardData={finalCardData}
                 images={imagesForScroll}
                 scrollButton={{ route: sectionConfig.scrollButtonKey, loading: sectionState.isLoading }}
                 handleNavigation={handleNavigation}
-              />
+                />
+              </div>
             );
           })}
 
-          <section className="my-6 rounded-lg bg-white p-4 shadow dark:bg-slate-800">
+          <section className="my-6 rounded-lg bg-white p-4 shadow dark:bg-slate-800"> {/* my-6 is already here, good */}
             <h2 className="mb-3 text-xl font-bold text-gray-800 dark:text-gray-100">Plan Your Stay</h2>
             <button
               onClick={() => handleExternalLink("https://www.booking.com")}

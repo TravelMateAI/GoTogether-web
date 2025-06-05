@@ -31,8 +31,8 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ item, imagePath }) => {
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-300 group-hover:from-black/60 group-hover:via-black/30" />
-      <div className="absolute bottom-0 left-0 z-10 p-3">
-        <p className="text-sm font-semibold text-white drop-shadow-md">
+      <div className="absolute bottom-0 left-0 z-10 p-4"> {/* Changed p-3 to p-4 */}
+        <p className="text-base font-semibold text-white drop-shadow-md"> {/* Changed text-sm to text-base */}
           {item.name}
         </p>
       </div>
