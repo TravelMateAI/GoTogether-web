@@ -1,18 +1,11 @@
 "use client"; // Required for useRouter and event handlers
 
 import React from "react";
-import { useRouter } from "next/navigation"; // Changed from expo-router
-import { Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Phone, Hospital, Siren, Contact, Landmark } from "lucide-react"; // Added new icons
 // Assuming NextUI Button, adjust if using a different import path e.g. @/components/ui/button
 // For now, we'll use standard button/a tags and style them with Tailwind.
 // If specific NextUI components like Card or Text are available, they can be integrated.
-
-// TODO: Define or import Colors. For now, using placeholder Tailwind classes.
-// const colorScheme = {
-//   tint: "text-blue-500", // Placeholder
-//   text: "text-gray-800", // Placeholder
-//   background: "bg-white", // Placeholder
-// };
 
 const emergencyContacts = [
   // URGENT EMERGENCY NUMBERS
@@ -30,87 +23,78 @@ const emergencyContacts = [
 ];
 
 export default function EmergencyScreen() {
-  // TODO: Adapt colorScheme handling. Using placeholders for now.
-  const colorScheme = {
-    tint: "text-blue-600", // Example placeholder
-    text: "text-neutral-800", // Example placeholder
-    background: "bg-neutral-50", // Example placeholder
-  };
-
   return (
-    <div className="flex-1"> {/* Replaces SafeAreaView */}
-      <div className="overflow-y-auto px-6 pt-1.5"> {/* Replaces ScrollView and container styles */}
-        <HeaderSection colorScheme={colorScheme} />
+    <div className="flex-1 bg-gray-100 dark:bg-gray-900"> {/* Added background for the whole screen */}
+      <div className="overflow-y-auto px-4 sm:px-6 py-6"> {/* Adjusted padding */}
+        <HeaderSection />
         <OfflineEmergencyCard />
-        <EmergencyGrid colorScheme={colorScheme} />
-        <EmergencyNumbersSection colorScheme={colorScheme} />
+        <EmergencyGrid />
+        <EmergencyNumbersSection />
       </div>
     </div>
   );
 }
 
-function HeaderSection({ colorScheme }: { colorScheme: { tint: string; text: string; } }) {
-  // Applying dark mode variants directly, assuming colorScheme.tint = "text-blue-600" and colorScheme.text = "text-neutral-800"
+function HeaderSection() {
   return (
-    <>
-      <h1 className={`text-3xl font-bold mb-1 ${colorScheme.tint} dark:text-blue-400`}> {/* Replaces Text and styles */}
+    <div className="mb-8 text-center sm:text-left"> {/* Added bottom margin and text alignment */}
+      <h1 className="text-3xl font-bold mb-2 text-blue-600 dark:text-blue-400 sm:text-4xl">
         Emergency & Safety
       </h1>
-      <p className={`text-base mb-7 ${colorScheme.text} dark:text-neutral-300`}> {/* Replaces Text and styles */}
+      <p className="text-base text-neutral-700 dark:text-neutral-300 sm:text-lg">
         Quick access to help
       </p>
-    </>
+    </div>
   );
 }
 
-function EmergencyGrid({ colorScheme }: { colorScheme: { text: string; background: string; } }) {
+function EmergencyGrid() {
   const router = useRouter();
   const emergencyItems = [
     {
-      emoji: "🚑",
+      icon: Hospital,
       label: "Hospitals Near Me",
       onClick: () => {
         const query = "hospitals near me";
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        window.open(url, "_blank", "noopener noreferrer"); // Replaces Linking.openURL
+        window.open(url, "_blank", "noopener noreferrer");
       },
     },
     {
-      emoji: "🚨",
+      icon: Siren,
       label: "Police Near Me",
       onClick: () => {
         const query = "police near me";
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-        window.open(url, "_blank", "noopener noreferrer"); // Replaces Linking.openURL
+        window.open(url, "_blank", "noopener noreferrer");
       },
     },
     {
-      emoji: "☎️",
+      icon: Contact,
       label: "Emergency Contacts",
       onClick: () => {
-        router.push("/emergency/emergency-contacts"); // Updated path
+        router.push("/emergency/emergency-contacts");
       },
     },
     {
-      emoji: "🏛️",
+      icon: Landmark,
       label: "Embassy Contacts",
       onClick: () => {
-        router.push("/emergency/embassy-contacts"); // Updated path
+        router.push("/emergency/embassy-contacts");
       },
     },
   ];
 
   return (
-    <div className="flex flex-row flex-wrap justify-between mb-6 gap-0.5"> {/* Replaces View and grid styles */}
+    <div className="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-2"> {/* Changed to grid and gap-4 */}
       {emergencyItems.map((item, index) => (
-        <button // Replaces PlatformPressable, can be a NextUI Button
+        <button
           key={index}
-          // Assuming colorScheme.background = "bg-neutral-50" and colorScheme.text = "text-neutral-800"
-          className={`w-[48%] p-5 rounded-2xl items-center mb-4 border border-gray-200 dark:border-slate-700 ${colorScheme.background} dark:bg-slate-800`} // card1 styles
+          className="flex flex-col items-center justify-center p-5 rounded-xl bg-white dark:bg-slate-800 shadow-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors duration-150"
           onClick={item.onClick}
         >
-          <span className="text-3xl mb-2 block text-center">{item.emoji}</span> {/* icon styles, ensure span behaves like Text */}
-          <p className={`text-sm font-medium text-center ${colorScheme.text} dark:text-neutral-200`}> {/* label styles */}
+          <item.icon size={32} className="mb-2 text-indigo-600 dark:text-indigo-400" />
+          <p className="text-sm font-medium text-center text-neutral-800 dark:text-neutral-200">
             {item.label}
           </p>
         </button>
@@ -141,31 +125,25 @@ function OfflineEmergencyCard() {
   );
 }
 
-function EmergencyNumbersSection({
-  colorScheme,
-}: {
-  colorScheme: { text: string; background: string; };
-}) {
-  // Assuming colorScheme.background = "bg-neutral-50" and colorScheme.text = "text-neutral-800"
+function EmergencyNumbersSection() {
   return (
-    <div className={`p-5 rounded-2xl mb-8 border border-gray-200 dark:border-slate-700 ${colorScheme.background} dark:bg-slate-800`}> {/* subContainer styles */}
-      <h2 className={`font-semibold text-lg mb-4 ${colorScheme.text} dark:text-neutral-100`}> {/* header styles */}
+    <div className="p-5 rounded-xl bg-white dark:bg-slate-800 shadow-md mb-8">
+      <h2 className="font-semibold text-xl mb-4 text-neutral-800 dark:text-neutral-100"> {/* Changed text-lg to text-xl */}
         Emergency Numbers
       </h2>
       {emergencyContacts.map(({ title, subtitle, phone }, index) => (
-        <a // Replaces TouchableOpacity for tel: links
+        <a
           key={index}
-          href={phone} // Standard href for tel links
-          className="block p-4 rounded-2xl flex flex-row justify-between items-center mb-3 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700" // card2 styles
+          href={phone}
+          className="block p-4 rounded-lg flex flex-row justify-between items-center mb-3 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors duration-150"
         >
           <div>
-            <p className={`font-medium text-base ${colorScheme.text} dark:text-neutral-200`}> {/* title2 styles */}
+            <p className="font-medium text-base text-neutral-800 dark:text-neutral-200">
               {title}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p> {/* subtitle styles */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
           </div>
-          {/* IconSymbol replaced with Lucide icon */}
-          <Phone size={24} className="text-green-500" /> {/* Phone icon color remains green */}
+          <Phone size={24} className="text-green-500" />
         </a>
       ))}
     </div>
