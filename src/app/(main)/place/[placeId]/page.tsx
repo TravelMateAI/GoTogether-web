@@ -311,7 +311,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                         fill
                         objectFit="cover"
                         className="transition-transform duration-200 hover:scale-105"
-                        priority // Consider if all these thumbnails need priority
+                        // Removed priority prop from gallery thumbnails
                         sizes="(max-width: 639px) 45vw, 30vw"
                       />
                     </div>
@@ -337,7 +337,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                 <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
                   <MessageSquare size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Reviews
                 </h2>
-                <div className="scrollbar-thin dark:scrollbar-thumb-slate-700 dark:scrollbar-track-slate-800 max-h-[600px] space-y-4 overflow-y-auto">
+                <div className="scrollbar-thin dark:scrollbar-thumb-slate-700 dark:scrollbar-track-slate-800 max-h-[600px] space-y-4 overflow-y-auto border rounded-md border-gray-200 dark:border-slate-700 p-3"> {/* Added border, rounded-md, and p-3 */}
                   {place.reviews.map((review, index) => (
                     <div key={index} className="border-b pb-3 last:border-b-0 last:pb-0 dark:border-gray-700">
                       <div className="mb-1 flex items-center">
