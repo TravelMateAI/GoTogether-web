@@ -1,6 +1,67 @@
+import { Lucia } from "lucia";
+import { Google } from "arctic"; // Changed import source
+// Assuming a placeholder adapter for now. In a real app, this would be configured.
+// e.g., import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+// import { prisma } from "./lib/prisma"; // Assuming prisma client is setup
+
 import * as cookie from "cookie"; // ✅ this works
 // ✅ For server components using next/headers
 import { cookies } from "next/headers";
+
+// Placeholder for Lucia adapter - replace with actual adapter (e.g., Prisma)
+const adapter = {
+  getSessionAndUser: async (sessionId: string) => {
+    // Implement according to your database and session management
+    console.warn("Lucia adapter getSessionAndUser not fully implemented.");
+    return [null, null] as [any, any]; // [session, user]
+  },
+  getUserSessions: async (userId: string) => {
+    console.warn("Lucia adapter getUserSessions not fully implemented.");
+    return [] as any[]; // array of sessions
+  },
+  setSession: async (session: any) => {
+    console.warn("Lucia adapter setSession not fully implemented.");
+  },
+  updateSessionExpiration: async (sessionId: string, expiresAt: Date) => {
+    console.warn("Lucia adapter updateSessionExpiration not fully implemented.");
+  },
+  deleteSession: async (sessionId: string) => {
+    console.warn("Lucia adapter deleteSession not fully implemented.");
+  },
+  deleteUserSessions: async (userId: string) => {
+    console.warn("Lucia adapter deleteUserSessions not fully implemented.");
+  },
+  deleteExpiredSessions: async () => {
+    console.warn("Lucia adapter deleteExpiredSessions not fully implemented.");
+  }
+  // You might also need setUser, updateUser, etc. depending on your adapter
+};
+
+
+export const lucia = new Lucia(adapter as any, { // Cast as any due to placeholder
+  sessionCookie: {
+    attributes: {
+      secure: process.env.NODE_ENV === "production",
+    },
+  },
+  getUserAttributes: (attributes) => {
+    return {
+      // attributes has the type of DatabaseUserAttributes
+      // e.g., username: attributes.username
+    };
+  },
+});
+
+// Register your Lucia instance globally (if not already done elsewhere)
+// globalThis.lucia = lucia; // Or use a more robust singleton pattern
+
+// Define Google OAuth provider
+// Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI are in your .env
+export const google = new Google(
+  process.env.GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID", // Fallback for build to pass
+  process.env.GOOGLE_CLIENT_SECRET || "YOUR_GOOGLE_CLIENT_SECRET", // Fallback
+  process.env.GOOGLE_REDIRECT_URI || "http://localhost:3000/login/google/callback" // Fallback
+);
 
 export async function getUserInfo(accessToken: string) {
   const response = await fetch(

@@ -99,6 +99,13 @@ export interface PlaceDetails {
   // website?: string; // Already included
 }
 
+export interface PlaceDetailsResponse {
+  result: PlaceDetails;
+  status: string;
+  error_message?: string;
+  html_attributions?: any[]; // As per Google's API, often empty but can be present
+}
+
 
 // It's also good practice to define nested types if they are complex or reused,
 // though for this structure, inline is also acceptable.

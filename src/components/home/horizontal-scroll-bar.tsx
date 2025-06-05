@@ -4,9 +4,10 @@ import { LocationDetail } from "@/types/location-types";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PlaceCard from "./PlaceCard"; // Import the new PlaceCard component
+import type { RouteKey } from "@/lib/routes"; // Import RouteKey
 
 interface ScrollButton {
-  route: string;
+  route: RouteKey; // Changed string to RouteKey
   loading: boolean;
 }
 
@@ -14,7 +15,7 @@ interface HorizontalScrollBarProps {
   title: string;
   cardData: LocationDetail[];
   scrollButton: ScrollButton;
-  handleNavigation: (route: string) => void;
+  handleNavigation: (route: RouteKey) => void; // Changed string to RouteKey
   images: string[];
 }
 const HorizontalScrollBar = (

@@ -20,7 +20,8 @@ export function useDeletePostMutation() {
   const mutation = useMutation({
     mutationFn: deletePost,
     onSuccess: async (deletedPost) => {
-      const queryFilter: QueryFilters = { queryKey: ["post-feed"] };
+      // Explicitly type queryFilter to match the TData used in setQueriesData
+      const queryFilter: QueryFilters<InfiniteData<PostsPage, string | null>> = { queryKey: ["post-feed"] };
 
       await queryClient.cancelQueries(queryFilter);
 
@@ -33,7 +34,7 @@ export function useDeletePostMutation() {
             pageParams: oldData.pageParams,
             pages: oldData.pages.map((page) => ({
               nextCursor: page.nextCursor,
-              posts: page.posts.filter((p) => p.id !== deletedPost.id),
+              posts: page.posts.filter((p) => p.postId !== deletedPost.postId), // Corrected to postId
             })),
           };
         },
@@ -43,8 +44,11 @@ export function useDeletePostMutation() {
         description: "Post deleted",
       });
 
-      if (pathname === `/posts/${deletedPost.id}`) {
-        router.push(`/users/${deletedPost.user.username}`);
+      if (pathname === `/posts/${deletedPost.postId}`) { // Corrected to postId
+        // Ensure deletedPost.user exists and has username, which it should due to updated DeletedPost type
+        if (deletedPost.user && deletedPost.user.username) {
+          router.push(`/users/${deletedPost.user.username}`);
+        }
       }
     },
     onError(error) {

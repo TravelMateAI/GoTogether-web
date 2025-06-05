@@ -1,6 +1,6 @@
-import { getPlaceDetailsByIdAction } from "./actions";
-import type { PlaceDetails } from "../../../../types/location-types";
-// import Image from "next/image";
+"use client"; // Make it a client component
+
+import React, { useEffect, useState, startTransition } from "react";
 import Link from "next/link";
 import {
   MapPin,
@@ -12,9 +12,16 @@ import {
   MessageSquare,
   ExternalLink,
   AlertTriangle,
-} from "lucide-react"; // Renamed Phone to PhoneIcon to avoid conflict
-import ClientImage from "@/components/shared/ClientImage"; // Ensure this path is correct
-// Helper function to render star ratings
+  Navigation, // For directions link
+  Loader2,    // For loading states
+  MapPinned,  // Icon for Get Directions button
+} from "lucide-react";
+import ClientImage from "@/components/shared/ClientImage";
+import { getPlaceDetailsByIdAction } from "./actions"; // Corrected import path
+import { getDirectionsAction, GoogleDirectionsResponse } from "../../actions"; // This one should be correct for the main actions file
+import type { PlaceDetails } from "../../../../types/location-types"; // Path to existing type
+
+// StarRating component remains the same
 const StarRating = ({
   rating,
   totalRatings,
@@ -30,26 +37,11 @@ const StarRating = ({
   return (
     <div className="flex items-center">
       {[...Array(fullStars)].map((_, i) => (
-        <Star
-          key={`full-${i}`}
-          size={20}
-          className="fill-yellow-400 text-yellow-400"
-        />
+        <Star key={`full-${i}`} size={20} className="fill-yellow-400 text-yellow-400" />
       ))}
-      {halfStar && (
-        <Star
-          key="half"
-          size={20}
-          className="fill-yellow-200 text-yellow-400"
-        />
-      )}{" "}
-      {/* Approximation of half-filled */}
+      {halfStar && <Star key="half" size={20} className="fill-yellow-200 text-yellow-400" />}
       {[...Array(emptyStars)].map((_, i) => (
-        <Star
-          key={`empty-${i}`}
-          size={20}
-          className="fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600"
-        />
+        <Star key={`empty-${i}`} size={20} className="fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600" />
       ))}
       <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
         {rating.toFixed(1)}
@@ -63,48 +55,116 @@ interface PlaceDetailPageProps {
   params: { placeId: string };
 }
 
-export default async function PlaceDetailPage({
-  params,
-}: PlaceDetailPageProps) {
+export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
   const { placeId } = params;
-  const placeDetailsResult = await getPlaceDetailsByIdAction(placeId);
 
-  if (!placeDetailsResult.success || !placeDetailsResult.data) {
+  // State for place details
+  const [place, setPlace] = useState<PlaceDetails | null>(null);
+  const [placeError, setPlaceError] = useState<string | null>(null);
+  const [isLoadingPlace, setIsLoadingPlace] = useState(true);
+
+  // State for directions
+  const [directionsData, setDirectionsData] = useState<GoogleDirectionsResponse | null>(null);
+  const [directionsError, setDirectionsError] = useState<string | null>(null);
+  const [isLoadingDirections, setIsLoadingDirections] = useState(false);
+  const [originForDirectionsLink, setOriginForDirectionsLink] = useState<string>("");
+
+  useEffect(() => {
+    if (placeId) {
+      startTransition(() => {
+        setIsLoadingPlace(true);
+        setPlaceError(null);
+      });
+      getPlaceDetailsByIdAction(placeId as string).then((result) => {
+        startTransition(() => {
+          if (result.success && result.data) {
+            setPlace(result.data);
+          } else {
+            setPlaceError(result.error || "Could not load details for this place.");
+          }
+          setIsLoadingPlace(false);
+        });
+      });
+    }
+  }, [placeId]);
+
+  const handleGetDirections = async () => {
+    if (!place || (!place.formatted_address && !place.name)) {
+      startTransition(() => {
+        setDirectionsError("Place details not available to get directions.");
+      });
+      return;
+    }
+
+    startTransition(() => {
+      setIsLoadingDirections(true);
+      setDirectionsError(null);
+      setDirectionsData(null);
+    });
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const currentOrigin = `${position.coords.latitude},${position.coords.longitude}`;
+        setOriginForDirectionsLink(currentOrigin); // Set for Google Maps link
+        const destination = place.formatted_address || place.name || "";
+
+        const result = await getDirectionsAction(currentOrigin, destination);
+        startTransition(() => {
+          if (result.success && result.data) {
+            if (result.status === "ZERO_RESULTS") {
+              setDirectionsError("No routes found for this origin and destination.");
+              setDirectionsData(null);
+            } else {
+              setDirectionsData(result.data);
+              setDirectionsError(null);
+            }
+          } else {
+            setDirectionsError(result.error || "Failed to get directions.");
+            setDirectionsData(null);
+          }
+          setIsLoadingDirections(false);
+        });
+      },
+      (geoError) => {
+        startTransition(() => {
+          setDirectionsError(`Could not get your current location: ${geoError.message}.`);
+          setIsLoadingDirections(false);
+        });
+      }
+    );
+  };
+
+  if (isLoadingPlace) {
+    return (
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-gray-100 p-4 text-center dark:bg-slate-900">
+        <Loader2 size={48} className="mb-4 animate-spin text-indigo-600" />
+        <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-gray-100">Loading Place Details...</h1>
+      </div>
+    );
+  }
+
+  if (placeError || !place) {
     return (
       <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-gray-100 p-4 text-center dark:bg-slate-900">
         <AlertTriangle size={48} className="mb-4 text-red-500" />
-        <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-gray-100">
-          Place Not Found
-        </h1>
+        <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-gray-100">Place Not Found</h1>
         <p className="mb-6 text-gray-600 dark:text-gray-400">
-          {placeDetailsResult.error ||
-            "Could not load details for this place. It might be an invalid ID or a network issue."}
+          {placeError || "Could not load details for this place. It might be an invalid ID or a network issue."}
         </p>
-        <Link href="/" legacyBehavior>
-          <a className="rounded-md bg-indigo-600 px-6 py-2 text-white transition-colors hover:bg-indigo-700">
+        <Link href="/" className="rounded-md bg-indigo-600 px-6 py-2 text-white transition-colors hover:bg-indigo-700">
             Back to Home
-          </a>
         </Link>
       </div>
     );
   }
 
-  const place = placeDetailsResult.data;
-  const DEFAULT_IMAGE_URL = "/assets/images/default-placeholder.png"; // Ensure this placeholder exists
+  const DEFAULT_IMAGE_URL = "/assets/images/default-placeholder.png";
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-slate-900">
-      {/* Image Header / Gallery */}
       {place.photo_urls && place.photo_urls.length > 0 ? (
         <div className="relative h-64 w-full overflow-hidden shadow-lg sm:h-80 md:h-96">
-          <ClientImage
-            src={place.photo_urls[0]}
-            alt={`Image of ${place.name}`}
-            fill // ✔ replaces layout="fill"
-            objectFit="cover" // ✔ correct usage as defined in your props
-            priority // ✔ correct usage
-          />
-          {/* Simple overlay for better text visibility if name is on image */}
+          <ClientImage src={place.photo_urls[0]} alt={`Image of ${place.name}`} fill objectFit="cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           <h1 className="absolute bottom-0 left-0 p-4 text-3xl font-bold text-white drop-shadow-xl sm:p-8 sm:text-4xl lg:text-5xl">
             {place.name}
@@ -112,232 +172,164 @@ export default async function PlaceDetailPage({
         </div>
       ) : (
         <header className="bg-gradient-to-r from-indigo-600 to-purple-700 p-8 text-center shadow-lg dark:from-indigo-700 dark:to-purple-800">
-          <h1 className="text-4xl font-bold text-white lg:text-5xl">
-            {place.name}
-          </h1>
+          <h1 className="text-4xl font-bold text-white lg:text-5xl">{place.name}</h1>
         </header>
       )}
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
-          {/* Main Content Column (Details) */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Key Info Section */}
             <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
               <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                <Info
-                  size={24}
-                  className="mr-2 text-indigo-600 dark:text-indigo-400"
-                />{" "}
-                Key Information
+                <Info size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Key Information
               </h2>
               <div className="space-y-3">
                 {place.formatted_address && (
                   <div className="flex items-start">
-                    <MapPin
-                      size={20}
-                      className="mr-3 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                    />
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {place.formatted_address}
-                    </p>
+                    <MapPin size={20} className="mr-3 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                    <p className="text-gray-700 dark:text-gray-300">{place.formatted_address}</p>
                   </div>
                 )}
                 {place.rating !== undefined && (
                   <div className="flex items-start">
-                    <Star
-                      size={20}
-                      className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                    />
-                    <StarRating
-                      rating={place.rating}
-                      totalRatings={place.user_ratings_total}
-                    />
+                    <Star size={20} className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                    <StarRating rating={place.rating} totalRatings={place.user_ratings_total} />
                   </div>
                 )}
                 {place.types && place.types.length > 0 && (
                   <div className="flex items-start">
-                    <Info
-                      size={20}
-                      className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                    />
-                    <div>
-                      {place.types.map((type) => (
-                        <span
-                          key={type}
-                          className="mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-slate-700 dark:text-gray-300"
-                        >
-                          {type.replace(/_/g, " ")}
-                        </span>
-                      ))}
-                    </div>
+                    <Info size={20} className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                    <div>{place.types.map((type) => (<span key={type} className="mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-slate-700 dark:text-gray-300">{type.replace(/_/g, " ")}</span>))}</div>
                   </div>
                 )}
                 {place.business_status && (
                   <div className="flex items-start">
-                    <Info
-                      size={20}
-                      className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                    />
-                    <p className="text-gray-700 dark:text-gray-300">
-                      Status:{" "}
-                      <span className="font-semibold">
-                        {place.business_status}
-                      </span>
-                    </p>
+                    <Info size={20} className="mr-3 mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                    <p className="text-gray-700 dark:text-gray-300">Status: <span className="font-semibold">{place.business_status}</span></p>
                   </div>
                 )}
               </div>
             </section>
 
-            {/* Contact & Links Section */}
+            {/* Get Directions Section */}
+            <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
+              <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                <MapPinned size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Get Directions
+              </h2>
+              <button
+                onClick={handleGetDirections}
+                disabled={isLoadingDirections || !place}
+                className="mb-4 flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white shadow transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isLoadingDirections ? (
+                  <> <Loader2 size={20} className="mr-2 animate-spin" /> Loading Directions... </>
+                ) : ( "Get Directions From My Location" )}
+              </button>
+
+              {isLoadingDirections && !directionsError && ( // Show loader only if no error yet during loading
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 size={32} className="animate-spin text-indigo-600 dark:text-indigo-400" />
+                  <p className="ml-3 text-gray-700 dark:text-gray-300">Fetching directions...</p>
+                </div>
+              )}
+
+              {directionsError && (
+                <div className="flex items-center rounded-md border border-red-400 bg-red-100 p-3 text-sm text-red-700 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300">
+                  <AlertTriangle size={20} className="mr-2 flex-shrink-0" /> {directionsError}
+                </div>
+              )}
+
+              {directionsData && directionsData.routes.length > 0 && directionsData.status === 'OK' && (
+                <div className="mt-4 space-y-3">
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    Route: {directionsData.routes[0].summary}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Total Distance: {directionsData.routes[0].legs[0].distance.text}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Estimated Duration: {directionsData.routes[0].legs[0].duration.text}
+                  </p>
+                  <h4 className="mt-2 font-medium text-gray-700 dark:text-gray-200">Steps:</h4>
+                  <ul className="list-decimal space-y-1 pl-5 text-sm text-gray-600 dark:text-gray-400">
+                    {directionsData.routes[0].legs[0].steps.map((step, index) => (
+                      <li key={index} dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {(place.formatted_address || place.name) && ( // Always show Google Maps link if place details are available
+                 <a
+                    href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originForDirectionsLink)}&destination=${encodeURIComponent(place.formatted_address || place.name || '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center text-indigo-600 hover:underline dark:text-indigo-400"
+                  >
+                    View on Google Maps <Navigation size={16} className="ml-1" />
+                  </a>
+              )}
+            </section>
+
             {(place.website || place.formatted_phone_number) && (
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
                 <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                  <ExternalLink
-                    size={24}
-                    className="mr-2 text-indigo-600 dark:text-indigo-400"
-                  />{" "}
-                  Contact & Links
+                  <ExternalLink size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Contact & Links
                 </h2>
                 <div className="space-y-3">
                   {place.formatted_phone_number && (
                     <div className="flex items-center">
-                      <PhoneIcon
-                        size={20}
-                        className="mr-3 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                      />
-                      <a
-                        href={`tel:${place.international_phone_number || place.formatted_phone_number}`}
-                        className="text-indigo-600 hover:underline dark:text-indigo-400"
-                      >
-                        {place.formatted_phone_number}
-                      </a>
+                      <PhoneIcon size={20} className="mr-3 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                      <a href={`tel:${place.international_phone_number || place.formatted_phone_number}`} className="text-indigo-600 hover:underline dark:text-indigo-400">{place.formatted_phone_number}</a>
                     </div>
                   )}
                   {place.website && (
                     <div className="flex items-center">
-                      <Globe
-                        size={20}
-                        className="mr-3 flex-shrink-0 text-gray-500 dark:text-gray-400"
-                      />
-                      <a
-                        href={place.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="truncate text-indigo-600 hover:underline dark:text-indigo-400"
-                      >
-                        {place.website}
-                      </a>
+                      <Globe size={20} className="mr-3 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                      <a href={place.website} target="_blank" rel="noopener noreferrer" className="truncate text-indigo-600 hover:underline dark:text-indigo-400">{place.website}</a>
                     </div>
                   )}
                 </div>
               </section>
             )}
 
-            {/* Photo Gallery Grid (if more than 1 photo) */}
             {place.photo_urls && place.photo_urls.length > 1 && (
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
-                <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                  Photo Gallery
-                </h2>
+                <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">Photo Gallery</h2>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                  {place.photo_urls.slice(1, 7).map(
-                    (
-                      url,
-                      index, // Show next 6 images, skipping the first one already used in header
-                    ) => (
-                      <div
-                        key={index}
-                        className="relative aspect-square overflow-hidden rounded-lg"
-                      >
-                        <ClientImage
-                          src={url}
-                          alt={`${place.name} photo ${index + 1}`}
-                          fill
-                          objectFit="cover"
-                          className="transition-transform duration-200 hover:scale-105"
-                          priority
-                        />
-                      </div>
-                    ),
-                  )}
+                  {place.photo_urls.slice(1, 7).map((url, index) => (<div key={index} className="relative aspect-square overflow-hidden rounded-lg"><ClientImage src={url} alt={`${place.name} photo ${index + 1}`} fill objectFit="cover" className="transition-transform duration-200 hover:scale-105" priority /></div>))}
                 </div>
               </section>
             )}
           </div>
 
-          {/* Sidebar Column (Opening Hours, Reviews) */}
           <div className="space-y-6 lg:col-span-1">
             {place.opening_hours && (
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
                 <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                  <Clock
-                    size={24}
-                    className="mr-2 text-indigo-600 dark:text-indigo-400"
-                  />{" "}
-                  Opening Hours
+                  <Clock size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Opening Hours
                 </h2>
-                {place.opening_hours.open_now !== undefined && (
-                  <p
-                    className={`mb-3 text-lg font-semibold ${place.opening_hours.open_now ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-                  >
-                    {place.opening_hours.open_now ? "Open now" : "Closed now"}
-                  </p>
-                )}
-                {place.opening_hours.weekday_text && (
-                  <ul className="space-y-1 text-gray-700 dark:text-gray-300">
-                    {place.opening_hours.weekday_text.map((line, index) => (
-                      <li key={index}>{line}</li>
-                    ))}
-                  </ul>
-                )}
-                {place.opening_hours.permanently_closed && (
-                  <p className="mt-3 font-semibold text-red-600 dark:text-red-400">
-                    Permanently Closed
-                  </p>
-                )}
+                {place.opening_hours.open_now !== undefined && (<p className={`mb-3 text-lg font-semibold ${place.opening_hours.open_now ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>{place.opening_hours.open_now ? "Open now" : "Closed now"}</p>)}
+                {place.opening_hours.weekday_text && (<ul className="space-y-1 text-gray-700 dark:text-gray-300">{place.opening_hours.weekday_text.map((line, index) => (<li key={index}>{line}</li>))}</ul>)}
+                {place.opening_hours.permanently_closed && (<p className="mt-3 font-semibold text-red-600 dark:text-red-400">Permanently Closed</p>)}
               </section>
             )}
-
             {place.reviews && place.reviews.length > 0 && (
               <section className="rounded-xl bg-white p-6 shadow-md dark:bg-slate-800">
                 <h2 className="mb-4 flex items-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                  <MessageSquare
-                    size={24}
-                    className="mr-2 text-indigo-600 dark:text-indigo-400"
-                  />{" "}
-                  Reviews
+                  <MessageSquare size={24} className="mr-2 text-indigo-600 dark:text-indigo-400" /> Reviews
                 </h2>
                 <div className="scrollbar-thin dark:scrollbar-thumb-slate-700 dark:scrollbar-track-slate-800 max-h-[600px] space-y-4 overflow-y-auto">
                   {place.reviews.map((review, index) => (
-                    <div
-                      key={index}
-                      className="border-b pb-3 last:border-b-0 last:pb-0 dark:border-gray-700"
-                    >
+                    <div key={index} className="border-b pb-3 last:border-b-0 last:pb-0 dark:border-gray-700">
                       <div className="mb-1 flex items-center">
-                        {review.profile_photo_url && (
-                          <ClientImage
-                            src={review.profile_photo_url}
-                            alt={review.author_name}
-                            width={32}
-                            height={32}
-                            className="mr-2 rounded-full"
-                          />
-                        )}
-                        <h4 className="font-semibold text-gray-800 dark:text-gray-200">
-                          {review.author_name}
-                        </h4>
+                        {review.profile_photo_url && (<ClientImage src={review.profile_photo_url} alt={review.author_name} width={32} height={32} className="mr-2 rounded-full" />)}
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200">{review.author_name}</h4>
                       </div>
                       <div className="mb-1 flex items-center">
                         <StarRating rating={review.rating} />
-                        <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-                          {review.relative_time_description}
-                        </span>
+                        <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{review.relative_time_description}</span>
                       </div>
-                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                        {review.text}
-                      </p>
+                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">{review.text}</p>
                     </div>
                   ))}
                 </div>

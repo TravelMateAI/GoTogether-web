@@ -1,6 +1,7 @@
 import SearchField from "@/components/SearchField";
 import UserButton from "@/components/UserButton";
 import Link from "next/link";
+import LanguageSwitcher from "../../components/LanguageSwitcher"; // Adjusted path
 
 export default function Navbar() {
   return (
@@ -10,7 +11,10 @@ export default function Navbar() {
           GoTogether
         </Link>
         <SearchField />
-        <UserButton className="sm:ms-auto" />
+        <div className="flex items-center gap-3 sm:ms-auto"> {/* Wrapper div for UserButton and LanguageSwitcher */}
+          <LanguageSwitcher />
+          <UserButton />
+        </div>
       </div>
     </header>
   );

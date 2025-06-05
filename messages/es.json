@@ -1,0 +1,12 @@
+{
+  "HomeScreen": {
+    "greeting": "¡Hola, Viajero!",
+    "searchPlaceholder": "Buscar lugares, actividades...",
+    "topPicksTitle": "⭐ Selecciones Destacadas Para Ti",
+    "entertainmentTitle": "🎬 Centros de Entretenimiento",
+    "cultureTitle": "🏛️ Experiencias Culturales"
+  },
+  "LanguageSwitcher": {
+    "selectLanguage": "Seleccionar Idioma"
+  }
+}

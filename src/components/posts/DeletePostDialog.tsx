@@ -43,7 +43,7 @@ export default function DeletePostDialog({
         <DialogFooter>
           <LoadingButton
             variant="destructive"
-            onClick={() => mutation.mutate(post.id, { onSuccess: onClose })}
+            onClick={() => mutation.mutate(post.postId, { onSuccess: onClose })} // Changed post.id to post.postId
             loading={mutation.isPending}
           >
             Delete

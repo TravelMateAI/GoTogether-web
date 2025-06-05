@@ -1,6 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError, UTApi } from "uploadthing/server";
-import { validateRequestFromCookie } from "../../../auth";
+import { validateRequest } from "@/auth"; // Using alias
 
 const f = createUploadthing();
 
@@ -9,7 +9,8 @@ export const fileRouter = {
     image: { maxFileSize: "512KB" },
   })
     .middleware(async ({ req }) => {
-      const { user, token } = await validateRequestFromCookie(req.headers.cookie);
+      const cookieHeader = req.headers.get('cookie');
+      const { user, token } = await validateRequest({ headers: { cookie: cookieHeader ?? undefined } });
       if (!user) throw new UploadThingError("Unauthorized");
       return { user, token };
     })
@@ -48,9 +49,12 @@ export const fileRouter = {
     video: { maxFileSize: "64MB", maxFileCount: 5 },
   })
     .middleware(async ({ req }) => {
-      const { user, token } = await validateRequestFromCookie(req.headers.cookie);
+      const cookieHeader = req.headers.get('cookie');
+      // Assuming the second middleware also needs user and token, if not, it might just need to pass token if user is validated once.
+      // For now, let's assume it also needs user for consistency or future use.
+      const { user, token } = await validateRequest({ headers: { cookie: cookieHeader ?? undefined } });
       if (!user) throw new UploadThingError("Unauthorized");
-      return { token };
+      return { token }; // This middleware only returns token, but validation implies user exists.
     })
     .onUploadComplete(async ({ file, metadata }) => {
       const mediaType = file.type.startsWith("image") ? "IMAGE" : "VIDEO";
