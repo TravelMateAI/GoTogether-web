@@ -18,8 +18,8 @@ import {
   ListTree,   // Icon for Related Places
 } from "lucide-react";
 import ClientImage from "@/components/shared/ClientImage";
-import { getPlaceDetailsByIdAction, getNearbyPlacesAction } from "./actions"; // Corrected import path, added getNearbyPlacesAction
-import { getDirectionsAction, GoogleDirectionsResponse } from "../../actions"; // This one should be correct for the main actions file
+import { getPlaceDetailsByIdAction } from "./actions"; // Kept local for place details
+import { getDirectionsAction, GoogleDirectionsResponse, getNearbyPlacesAction } from "../../actions"; // Moved getNearbyPlacesAction here
 import type { PlaceDetails } from "../../../../types/location-types"; // Path to existing type
 import HorizontalScrollBar from "@/components/home/horizontal-scroll-bar"; // Import HorizontalScrollBar
 
