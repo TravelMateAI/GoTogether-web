@@ -25,7 +25,7 @@ export default function PlannerPage() {
       </main>
 
       <footer className="mt-12 text-center text-sm text-gray-500 dark:text-slate-400">
-        <p>&copy; {new Date().getFullYear()} Your App Name. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} GoTogether. All rights reserved.</p>
       </footer>
     </div>
   );

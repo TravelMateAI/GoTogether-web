@@ -293,7 +293,7 @@ export default function HomeScreen() {
           </section>
         </main>
         <footer className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Your App Name. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} GoTogether. All rights reserved.</p>
         </footer>
       </div>
     </div>

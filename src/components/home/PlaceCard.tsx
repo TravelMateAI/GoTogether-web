@@ -17,7 +17,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ item, imagePath }) => {
       // The key prop should be applied when mapping over PlaceCard components in the parent.
       // Adding it here would cause a warning if PlaceCard is used directly with a key.
       // key={item.place_id || item.name}
-      className="group relative h-36 w-[calc(50%-0.5rem)] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-200 ease-in-out hover:shadow-xl sm:w-[calc(100%/3-0.75rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(100%/6-0.833rem)]"
+      className="group relative h-36 cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-200 ease-in-out hover:shadow-xl"
     >
       <Image
         src={imagePath}

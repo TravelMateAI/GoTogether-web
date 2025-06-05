@@ -1,6 +1,6 @@
-# Hbook - Full-Stack Social Media App
+# GoTogether - Full-Stack Social Media App
 
-Hbook is a full-stack social media platform inspired by Twitter and Facebook, built using cutting-edge technologies like Next.js 15, Lucia for authentication, Prisma for database management, and more. This app includes features such as infinite scrolling feeds, real-time direct messaging, likes, comments, and notifications.
+GoTogether is a full-stack social media platform inspired by Twitter and Facebook, built using cutting-edge technologies like Next.js 15, Lucia for authentication, Prisma for database management, and more. This app includes features such as infinite scrolling feeds, real-time direct messaging, likes, comments, and notifications.
 
 ## Table of Contents
 
@@ -64,8 +64,8 @@ Ensure you have the following installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/hbook.git
-   cd hbook
+   git clone https://github.com/yourusername/gotogether.git
+   cd gotogether
    ```
 
 2. **Install dependencies:**
@@ -85,7 +85,7 @@ Ensure you have the following installed:
 
    - Create a `.env` file in the root of your project with the following content:
      ```
-     DATABASE_URL="postgresql://user:password@localhost:5432/hbook"
+     DATABASE_URL="postgresql://user:password@localhost:5432/gotogether"
      ```
 
 3. **Run Prisma migrations:**
