@@ -19,7 +19,7 @@ const kyInstance = ky.create({
 
 // New instance for Go backend
 export const goKyInstance = ky.create({
-  prefixUrl: "http://localhost:8000", // Changed prefixUrl
+  prefixUrl: "http://localhost:8083", // Changed prefixUrl
   credentials: "include",
   parseJson: (text) => {
     // Copied parseJson
