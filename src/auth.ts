@@ -78,7 +78,7 @@ export async function getUserInfo(accessToken: string) {
 }
 
 // Shared base64 decoder
-function decodeUser(encoded: string) {
+export function decodeUser(encoded: string) {
   try {
     console.log("📦 Raw encoded user cookie:", JSON.stringify(encoded));
 

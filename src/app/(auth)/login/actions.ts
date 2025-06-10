@@ -11,10 +11,8 @@ export async function login(
 
   console.debug("[login] Sending credentials to backend:", { username });
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/login`,
-    {
-      method: "POST",
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -28,35 +26,6 @@ export async function login(
     console.warn("[login] Login failed:", error);
     return { error: error.message || "Login failed" };
   }
-
-  const { accessToken, user: userDetails } = await res.json();
-
-  console.debug("[login] Received access token and user details:", {
-    accessToken,
-    userDetails,
-  });
-
-  if (!accessToken || !userDetails) {
-    console.error("[login] Invalid response from backend");
-    return { error: "Invalid login response" };
-  }
-
-  // Step 3: Store access token and user info in cookies
-  const cookieStore = cookies();
-
-  cookieStore.set("access_token", accessToken, {
-    path: "/",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 3600,
-  });
-
-  cookieStore.set("user", JSON.stringify(userDetails), {
-    path: "/",
-    httpOnly: false, // Client can read
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 3600,
-  });
 
   // ✅ Will throw NEXT_REDIRECT internally to trigger redirect
   redirect("/");
