@@ -400,7 +400,10 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                 </h2>
                 <HorizontalScrollBar
                   title="" // Title is handled by the h2 above
-                  cardData={relatedPlaces} // relatedPlaces are PlaceDetails[], compatible with LocationDetail[]
+                  cardData={relatedPlaces.map(place => ({
+                    ...place,
+                    vicinity: place.vicinity || "",
+                  }))} // relatedPlaces are PlaceDetails[], compatible with LocationDetail[]
                   images={relatedPlaces.map(p => p.photo_urls?.[0] || DEFAULT_IMAGE_URL)}
                   scrollButton={{ route: "" as any, loading: false }} // Effectively hides "See all"
                   handleNavigation={() => {}} // Dummy function as "See all" is hidden
