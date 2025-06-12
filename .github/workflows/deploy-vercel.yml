@@ -19,7 +19,7 @@ jobs:
           node-version: "20.16.0"
 
       - name: Install Vercel CLI (working version)
-        run: npm install --global vercel@37.4.2
+        run: npm install --global vercel@latest
 
       - name: Print environment and versions
         run: |
