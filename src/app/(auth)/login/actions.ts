@@ -11,8 +11,10 @@ export async function login(
 
   console.debug("[login] Sending credentials to backend:", { username });
 
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/login`,
+    {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
