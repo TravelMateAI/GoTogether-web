@@ -1,0 +1,12 @@
+{
+  "HomeScreen": {
+    "greeting": "Hello, Wanderer!",
+    "searchPlaceholder": "Search for places, activities...",
+    "topPicksTitle": "⭐ Top Picks For You",
+    "entertainmentTitle": "🎬 Entertainment Hotspots",
+    "cultureTitle": "🏛️ Cultural Experiences"
+  },
+  "LanguageSwitcher": {
+    "selectLanguage": "Select Language"
+  }
+}

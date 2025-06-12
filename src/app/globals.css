@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "~stream-chat-react/dist/css/v2/index.css";
+
+@layer base {
+  :root {
+    --background: 232, 28%, 97%; /* Soft light gray */
+    --foreground: 230, 20%, 20%; /* Dark charcoal */
+
+    --card: 0, 0%, 100%; /* Pure white */
+    --card-foreground: 230, 20%, 20%; /* Dark charcoal */
+
+    --popover: 0, 0%, 100%; /* Pure white */
+    --popover-foreground: 230, 20%, 20%; /* Dark charcoal */
+
+    --primary: 195, 100%, 50%; /* Neon Blue */
+    --primary-foreground: 0, 0%, 100%; /* Pure white */
+
+    --secondary: 195, 100%, 50%; /* Neon Blue */
+    --secondary-foreground: 0, 0%, 20%; /* Very dark gray */
+
+    --muted: 210, 16%, 93%; /* Light grayish blue */
+    --muted-foreground: 210, 10%, 40%; /* Grayish blue */
+
+    --accent: 195, 100%, 50%; /* Neon Blue */
+    --accent-foreground: 0, 0%, 100%; /* Pure white */
+
+    --destructive: 0, 85%, 62%; /* Bright red */
+    --destructive-foreground: 0, 0%, 100%; /* Pure white */
+
+    --border: 210, 16%, 80%; /* Light grayish blue */
+    --input: 210, 16%, 93%; /* Light grayish blue */
+    --ring: 195, 100%, 50%; /* Neon Blue */
+
+    --radius: 0.75rem; /* Slightly smaller border radius */
+  }
+
+  .dark {
+    --background: 220, 20%, 12%; /* Dark navy */
+    --foreground: 0, 0%, 98%; /* Almost white */
+
+    --card: 224, 28%, 15%; /* Dark slate */
+    --card-foreground: 0, 0%, 98%; /* Almost white */
+
+    --popover: 224, 28%, 12%; /* Darker slate */
+    --popover-foreground: 0, 0%, 98%; /* Almost white */
+
+    --primary: 195, 100%, 50%; /* Neon Blue */
+    --primary-foreground: 0, 0%, 98%; /* Almost white */
+
+    --secondary: 195, 100%, 50%; /* Neon Blue */
+    --secondary-foreground: 0, 0%, 98%; /* Almost white */
+
+    --muted: 0, 0%, 25%; /* Dark gray */
+    --muted-foreground: 210, 12%, 65%; /* Medium grayish blue */
+
+    --accent: 195, 100%, 50%; /* Neon Blue */
+    --accent-foreground: 0, 0%, 98%; /* Almost white */
+
+    --destructive: 0, 80%, 58%; /* Slightly muted red */
+    --destructive-foreground: 0, 100%, 98%; /* Almost white */
+
+    --border: 0, 0%, 25%; /* Dark gray */
+    --input: 0, 0%, 25%; /* Dark gray */
+    --ring: 195, 100%, 50%; /* Neon Blue */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.str-chat {
+  --str-chat__font-family: inherit;
+  --str-chat__primary-color: theme(colors.primary.DEFAULT);
+  --str-chat__on-primary-color: theme(colors.primary.foreground);
+  --str-chat__active-primary-color: theme(colors.primary.foreground);
+  --str-chat__primary-color-low-emphasis: color-mix(
+    in hsl,
+    hsl(var(--primary)) 10%,
+    transparent
+  );
+  --str-chat__background-color: theme(colors.card.DEFAULT);
+  --str-chat__secondary-background-color: theme(colors.card.DEFAULT);
+  --str-chat__message-textarea-background-color: theme(colors.background);
+  --str-chat__channel-preview-active-background-color: theme(
+    colors.accent.DEFAULT
+  );
+  --str-chat__channel-preview-hover-background-color: var(
+    --str-chat__channel-preview-active-background-color
+  );
+  --str-chat__secondary-surface-color: theme(colors.muted.DEFAULT);
+  --str-chat__own-message-bubble-color: theme(colors.primary.foreground);
+  --str-chat__primary-surface-color: theme(colors.primary.DEFAULT);
+  --str-chat__primary-surface-color-low-emphasis: var(
+    --str-chat__primary-color-low-emphasis
+  );
+  --str-chat__disabled-color: theme(colors.muted.DEFAULT);
+  --str-chat__cta-button-border-radius: var(--radius);
+}
+
+.str-chat-channel-list {
+  border-right: none;
+}
+
+.str-chat__channel-list-react .str-chat__channel-list-messenger-react {
+  padding-bottom: 0;
+}
+
+.str-chat__channel-search-bar-button--exit-search {
+  display: none;
+}
