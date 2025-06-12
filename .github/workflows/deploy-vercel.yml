@@ -3,7 +3,7 @@ name: Deploy to Vercel
 on:
   push:
     branches:
-      - deploy # Trigger deployment on push to the 'deploy' branch
+      - deploy
 
 jobs:
   deploy:
@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # Use your Node.js version
+          node-version: "18"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -26,7 +26,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Install dependencies (legacy peer deps)
+      - name: Install dependencies (using legacy-peer-deps)
         run: npm install --legacy-peer-deps
 
       - name: Build Project Artifacts
