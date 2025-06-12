@@ -8,8 +8,8 @@ import "./globals.css";
 import ReactQueryProvider from "./ReactQueryProvider";
 
 // next-intl imports
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server'; // Import getMessages
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server"; // Import getMessages
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,16 +23,17 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | GoTogether", 
-    default: "GoTogether", 
+    template: "%s | GoTogether",
+    default: "GoTogether",
   },
-  description: "The social media app for powernerds",
+  description:
+    "GoTogether is a smart travel planning web app that combines AI-powered itinerary recommendations with social media features. Discover top destinations, collaborate with friends, share your journeys, and get real-time suggestions for hotels, restaurants, and attractions — all in one seamless platform.",
 };
 
 export default async function RootLayout({
   children,
   params, // params.locale is automatically passed by Next.js if route is /app/[locale]/...
-           // but getLocale() is more general if locale isn't always in path params at this layout level
+  // but getLocale() is more general if locale isn't always in path params at this layout level
 }: Readonly<{
   children: React.ReactNode;
   params?: { locale?: string };
@@ -40,12 +41,14 @@ export default async function RootLayout({
   // Use params.locale if available and valid, otherwise fallback to getLocale()
   // This handles cases where this RootLayout might be used directly by a locale-specific route segment.
   // However, with `localePrefix: 'as-needed'` and middleware, `getLocale()` should be reliable.
-  const locale = params?.locale || await getLocale();
+  const locale = params?.locale || (await getLocale());
   console.log("RootLayout - Determined locale:", locale); // Added console.log
   const messages = await getMessages(); // Uses the locale from getRequestConfig in i18n.ts
 
   return (
-    <html lang={locale}> {/* Set lang attribute to the current locale */}
+    <html lang={locale}>
+      {" "}
+      {/* Set lang attribute to the current locale */}
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <NextIntlClientProvider
           locale={locale}
