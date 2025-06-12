@@ -21,6 +21,13 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      - name: Print environment and versions
+        run: |
+          node -v
+          npm -v
+          npx vercel --version
+          cat package.json
+
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         env:
@@ -34,9 +41,11 @@ jobs:
         run: |
           echo "node_modules" > .vercelignore
           echo ".vercel" >> .vercelignore
+          echo "package.json" >> .vercelignore
+          echo "package-lock.json" >> .vercelignore
 
       - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: npm exec vercel build -- --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -46,3 +55,4 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
