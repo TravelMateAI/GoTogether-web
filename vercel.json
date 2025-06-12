@@ -1,5 +1,5 @@
 {
-  "framework": "nextjs",
+  "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "crons": [
@@ -9,4 +9,3 @@
     }
   ]
 }
-
