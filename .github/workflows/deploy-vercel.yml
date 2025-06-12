@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Vercel
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --confirm --yes
+        run: vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }} --confirm --yes
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
