@@ -1,8 +1,5 @@
 {
-  "crons": [
-    {
-      "path": "/api/clear-uploads",
-      "schedule": "0 2 * * *"
-    }
-  ]
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs"
 }
