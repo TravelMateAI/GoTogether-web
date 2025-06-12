@@ -40,8 +40,8 @@ jobs:
         run: |
           echo "node_modules" > .vercelignore
           echo ".vercel" >> .vercelignore
-          echo "package.json" >> .vercelignore
-          echo "package-lock.json" >> .vercelignore
+          # echo "package.json" >> .vercelignore
+          # echo "package-lock.json" >> .vercelignore
 
       - name: Build Project using Next.js
         run: npm run build
