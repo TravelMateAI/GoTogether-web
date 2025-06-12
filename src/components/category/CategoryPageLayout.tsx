@@ -148,17 +148,30 @@
 
           {!loading && !error && places.length > 0 && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
-              {places.map((place) => (
-                <PlaceCard
-                  key={place.place_id}
-                  item={place}
-                  imagePath={
-                    place.photo_urls && place.photo_urls.length > 0
-                      ? place.photo_urls[0]
-                      : DEFAULT_IMAGE_URL
+              {places.map((place) => {
+                // Determine the image path for the place card
+                let imagePath = DEFAULT_IMAGE_URL;
+                if (place.photo_urls && place.photo_urls.length > 0) {
+                  let originalUrl = place.photo_urls[0];
+                  // Check if it's a Google Maps photo URL and if it contains maxwidth=400
+                  if (typeof originalUrl === 'string' && originalUrl.includes("maps.googleapis.com/maps/api/place/photo") && originalUrl.includes("maxwidth=400")) {
+                    // Frontend mitigation: Request a larger image from Google Maps to better match display needs (e.g., 640px width for Next/Image).
+                    // This aims to prevent Next/Image from upscaling a 400px image, which can affect quality.
+                    // TODO: The ideal long-term solution is for the backend service to provide image URLs
+                    // with appropriate maxwidth parameters (e.g., maxwidth=640) directly.
+                    imagePath = originalUrl.replace("maxwidth=400", "maxwidth=640");
+                  } else {
+                    imagePath = originalUrl;
                   }
-                />
-              ))}
+                }
+                return (
+                  <PlaceCard
+                    key={place.place_id}
+                    item={place}
+                    imagePath={imagePath}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
