@@ -8,7 +8,10 @@ export default function GoogleSignInButton() {
       asChild
     >
       <a
-        href="http://localhost:8080/oauth2/authorization/google"
+        href={
+          process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL ||
+          "http://localhost:8080/oauth2/authorization/google"
+        }
         className="flex w-full items-center gap-2"
       >
         <GoogleIcon />

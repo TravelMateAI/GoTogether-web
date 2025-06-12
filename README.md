@@ -81,12 +81,20 @@ Ensure you have the following installed:
    npm install prisma --save-dev
    ```
 
-2. **Set up your database connection:**
+2. **Set up your environment variables:**
 
-   - Create a `.env` file in the root of your project with the following content:
+   - This project uses environment variables for configuration. A template file `.env.example` is provided in the root directory.
+   - Copy this file to a new file named `.env`:
+     ```bash
+     cp .env.example .env
      ```
-     DATABASE_URL="postgresql://user:password@localhost:5432/gotogether"
-     ```
+   - **Important**: Open the `.env` file and fill in the required values for your local development environment. This includes:
+     - `DATABASE_URL`: Your PostgreSQL connection string. For local development, it might look like `postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/gotogether?schema=public`. If using Docker, the hostname might be `db` (e.g., `postgresql://user:password@db:5432/gotogether`).
+     - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Your Google OAuth credentials.
+     - `UPLOADTHING_SECRET` and `NEXT_PUBLIC_UPLOADTHING_APP_ID`: Your UploadThing credentials.
+     - URLs for backend services (`NEXT_PUBLIC_BACKEND_URL`, `NEXT_PUBLIC_GO_BACKEND_URL`) if they differ from the defaults.
+     - Keycloak URLs if you are using a custom Keycloak instance.
+   - The `.env` file is already listed in `.gitignore` and should not be committed to your repository.
 
 3. **Run Prisma migrations:**
 
