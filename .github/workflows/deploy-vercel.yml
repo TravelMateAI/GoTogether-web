@@ -26,8 +26,8 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Install dependencies (force to bypass peer conflict)
-        run: npm install --force
+      - name: Install dependencies (legacy peer deps)
+        run: npm install --legacy-peer-deps
 
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
