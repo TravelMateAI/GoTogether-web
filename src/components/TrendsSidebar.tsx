@@ -1,6 +1,6 @@
 import { validateRequest } from "@/auth";
 // import prisma from "@/lib/prisma";
-import { getUserDataSelect } from "@/lib/types";
+// import { getUserDataSelect } from "@/lib/types"; // This type/function is not defined in types.ts and its usage is commented out
 import { formatNumber } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { unstable_cache } from "next/cache";

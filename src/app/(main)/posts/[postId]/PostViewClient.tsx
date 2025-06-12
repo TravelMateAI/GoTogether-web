@@ -4,11 +4,11 @@
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import Post from "@/components/posts/Post";
-import UserInfoSidebar from "./UserInfoSidebar";
-import { PostWithUser } from "@/lib/types"; // Define this if not available
+// import UserInfoSidebar from "./UserInfoSidebar"; // TODO: UserInfoSidebar component is missing. Restore or implement.
+import { PostData } from "@/lib/types"; // Changed PostWithUser to PostData
 
 interface Props {
-  post: PostWithUser;
+  post: PostData; // Changed PostWithUser to PostData
   loggedInUserId: string;
 }
 
@@ -20,7 +20,7 @@ export default function PostViewClient({ post, loggedInUserId }: Props) {
       </div>
       <div className="sticky top-[5.25rem] hidden h-fit w-80 flex-none lg:block">
         <Suspense fallback={<Loader2 className="mx-auto animate-spin" />}>
-          <UserInfoSidebar user={post.user} loggedInUserId={loggedInUserId} />
+          {/* TODO: UserInfoSidebar component is missing. Was: <UserInfoSidebar user={post.user} loggedInUserId={loggedInUserId} /> */}
         </Suspense>
       </div>
     </main>

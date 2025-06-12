@@ -48,14 +48,14 @@ export async function login(
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 3600,
+    maxAge: 3600, // Or use expiresIn from backend response if available and preferred
   });
 
   cookieStore.set("user", JSON.stringify(userDetails), {
     path: "/",
     httpOnly: false, // Client can read
     secure: process.env.NODE_ENV === "production",
-    maxAge: 3600,
+    maxAge: 3600, // Or use expiresIn from backend response
   });
 
   // ✅ Will throw NEXT_REDIRECT internally to trigger redirect

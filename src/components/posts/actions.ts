@@ -8,6 +8,9 @@ import kyInstance from "@/lib/ky";
 export interface DeletedPost {
   postId: string;
   message: string;
+  user: { // Assuming the backend returns the user's username upon deletion for the redirect
+    username: string;
+  };
 }
 
 export async function deletePost(postId: string): Promise<DeletedPost> {

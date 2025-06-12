@@ -6,9 +6,12 @@ export async function GET() {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
 
-  const url = await google.createAuthorizationURL(state, codeVerifier, {
-    scopes: ["profile", "email"],
-  });
+  // The third argument for scopes should be a string[] according to Arctic's documentation and the error
+  const url = await google.createAuthorizationURL(state, codeVerifier, [
+    "openid", // Standard scope
+    "profile",
+    "email",
+  ]);
 
   cookies().set("state", state, {
     path: "/",
