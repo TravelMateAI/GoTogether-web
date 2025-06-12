@@ -18,36 +18,23 @@ jobs:
         with:
           node-version: "20.16.0"
 
-      - name: Install Vercel CLI (working version)
+      - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Print environment and versions
+      - name: Print environment info
         run: |
           node -v
           npm -v
-          npx vercel --version
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel --version
 
       - name: Install dependencies with legacy peer deps
         run: npm install --legacy-peer-deps
 
-      - name: Prevent Vercel CLI from reinstalling deps
-        run: |
-          echo "node_modules" > .vercelignore
-          echo ".vercel" >> .vercelignore
-          # echo "package.json" >> .vercelignore
-          # echo "package-lock.json" >> .vercelignore
+      - name: Build the project (Next.js)
+        run: npm run build
 
-      - name: Build using Vercel CLI
-        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy  --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
