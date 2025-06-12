@@ -3,7 +3,7 @@ name: Deploy to Vercel
 on:
   push:
     branches:
-      - deploy  # Trigger deployment on push to 'deploy' branch
+      - deploy
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"  # Adjust if using a different version
+          node-version: "18"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -27,24 +27,22 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Install dependencies (with legacy peer deps)
+      - name: Install dependencies with legacy peer resolution
         run: npm install --legacy-peer-deps
 
-      - name: Prevent Vercel CLI from reinstalling dependencies
-        run: echo "node_modules" > .vercelignore
+      - name: Prevent Vercel CLI from reinstalling deps
+        run: |
+          echo "node_modules" > .vercelignore
+          echo ".vercel" >> .vercelignore
 
-      - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts with existing deps
+        run: npx vercel build --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-
-
-
