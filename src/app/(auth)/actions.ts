@@ -20,6 +20,6 @@ export async function logout() {
     path: "/api/auth/refresh",
     maxAge: 0,
   });
-  const keycloakLogoutUrl = `http://localhost:8084/realms/kong/protocol/openid-connect/logout?client_id=kong-oidc&post_logout_redirect_uri=http://localhost:3000/login`;
+  const keycloakLogoutUrl = `${process.env.NEXT_PUBLIC_KEYCLOAK_LOGOUT_URL || "http://localhost:8084/realms/kong/protocol/openid-connect/logout"}?client_id=kong-oidc&post_logout_redirect_uri=${process.env.NEXT_PUBLIC_KEYCLOAK_REDIRECT_URI || "http://localhost:3000/login"}`;
   return redirect(keycloakLogoutUrl);
 }

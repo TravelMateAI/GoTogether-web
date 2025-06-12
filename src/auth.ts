@@ -23,7 +23,9 @@ const adapter = {
     console.warn("Lucia adapter setSession not fully implemented.");
   },
   updateSessionExpiration: async (sessionId: string, expiresAt: Date) => {
-    console.warn("Lucia adapter updateSessionExpiration not fully implemented.");
+    console.warn(
+      "Lucia adapter updateSessionExpiration not fully implemented.",
+    );
   },
   deleteSession: async (sessionId: string) => {
     console.warn("Lucia adapter deleteSession not fully implemented.");
@@ -33,12 +35,12 @@ const adapter = {
   },
   deleteExpiredSessions: async () => {
     console.warn("Lucia adapter deleteExpiredSessions not fully implemented.");
-  }
+  },
   // You might also need setUser, updateUser, etc. depending on your adapter
 };
 
-
-export const lucia = new Lucia(adapter as any, { // Cast as any due to placeholder
+export const lucia = new Lucia(adapter as any, {
+  // Cast as any due to placeholder
   sessionCookie: {
     attributes: {
       secure: process.env.NODE_ENV === "production",
@@ -60,12 +62,14 @@ export const lucia = new Lucia(adapter as any, { // Cast as any due to placehold
 export const google = new Google(
   process.env.GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID", // Fallback for build to pass
   process.env.GOOGLE_CLIENT_SECRET || "YOUR_GOOGLE_CLIENT_SECRET", // Fallback
-  process.env.GOOGLE_REDIRECT_URI || "http://localhost:3000/login/google/callback" // Fallback
+  process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
+    "http://localhost:3000/login/google/callback", // Fallback
 );
 
 export async function getUserInfo(accessToken: string) {
   const response = await fetch(
-    "http://localhost:8081/realms/kong/protocol/openid-connect/userinfo",
+    process.env.NEXT_PUBLIC_KEYCLOAK_USERINFO_ENDPOINT ||
+      "http://localhost:8081/realms/kong/protocol/openid-connect/userinfo",
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

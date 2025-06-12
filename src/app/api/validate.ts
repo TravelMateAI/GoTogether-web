@@ -5,12 +5,13 @@ import { validateRequest } from "../../auth";
 // Replace this with your actual user info fetch logic
 async function getUserInfo(accessToken: string) {
   const response = await fetch(
-    "http://localhost:8081/realms/kong/protocol/openid-connect/userinfo",
+    process.env.NEXT_PUBLIC_KEYCLOAK_USERINFO_ENDPOINT ||
+      "http://localhost:8081/realms/kong/protocol/openid-connect/userinfo",
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
@@ -20,7 +21,10 @@ async function getUserInfo(accessToken: string) {
   return await response.json();
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { user } = await validateRequest(req);
-    return res.status(200).json({ user });
-  }
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const { user } = await validateRequest(req);
+  return res.status(200).json({ user });
+}

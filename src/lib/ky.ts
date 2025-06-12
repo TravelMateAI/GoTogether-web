@@ -10,7 +10,7 @@ let failedRequestsQueue: {
 }[] = [];
 
 const defaultOptions: Options = {
-  prefixUrl: "http://localhost:8080",
+  prefixUrl: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080",
   credentials: "include",
   parseJson: (text) => {
     if (!text || text.trim() === "") return null;
@@ -53,7 +53,10 @@ const kyInstance = ky.create({
       async (request, options, response) => {
         const requestUrl = new URL(request.url); // Get full URL for proper check
         // Check if it's a 401 and not a refresh attempt that failed
-        if (response.status === 401 && !requestUrl.pathname.endsWith("/api/auth/refresh")) {
+        if (
+          response.status === 401 &&
+          !requestUrl.pathname.endsWith("/api/auth/refresh")
+        ) {
           if (!isRefreshing) {
             isRefreshing = true;
             try {
@@ -78,11 +81,13 @@ const kyInstance = ky.create({
                 // Retry the original request and all queued requests
                 const originalRetry = ky(request); // Retry original first
                 const queuedRetries = failedRequestsQueue.map(
-                  (prom) => ky(prom.request) // Then retry queued
+                  (prom) => ky(prom.request), // Then retry queued
                 );
 
                 // Resolve all promises
-                failedRequestsQueue.forEach((prom, index) => prom.resolve(queuedRetries[index]));
+                failedRequestsQueue.forEach((prom, index) =>
+                  prom.resolve(queuedRetries[index]),
+                );
                 failedRequestsQueue = [];
                 isRefreshing = false;
                 return originalRetry; // Return the promise for the original request
@@ -93,7 +98,9 @@ const kyInstance = ky.create({
                   await refreshResponse.text(),
                 );
                 // Reject all queued requests
-                failedRequestsQueue.forEach((prom) => prom.reject(refreshResponse.clone())); // Clone response for multiple rejections
+                failedRequestsQueue.forEach((prom) =>
+                  prom.reject(refreshResponse.clone()),
+                ); // Clone response for multiple rejections
                 failedRequestsQueue = [];
                 isRefreshing = false;
                 // If refresh fails, the original request's 401 response will be returned
@@ -113,23 +120,34 @@ const kyInstance = ky.create({
             // Token is already refreshing, queue this request
             console.log("Token is refreshing. Queuing request:", request.url);
             return new Promise((resolve, reject) => {
-              failedRequestsQueue.push({ resolve, reject, request: request.clone() }); // Clone request
+              failedRequestsQueue.push({
+                resolve,
+                reject,
+                request: request.clone(),
+              }); // Clone request
             });
           }
-        } else if (response.status === 401 && requestUrl.pathname.endsWith("/api/auth/refresh")) {
-            // This means the refresh token itself is invalid or expired.
-            console.error("Refresh token is invalid or expired. User needs to re-authenticate.");
-            isRefreshing = false; // Reset flag
-            // Reject all queued requests because refresh is impossible
-            failedRequestsQueue.forEach(prom => prom.reject(response.clone())); // Clone response
-            failedRequestsQueue = [];
+        } else if (
+          response.status === 401 &&
+          requestUrl.pathname.endsWith("/api/auth/refresh")
+        ) {
+          // This means the refresh token itself is invalid or expired.
+          console.error(
+            "Refresh token is invalid or expired. User needs to re-authenticate.",
+          );
+          isRefreshing = false; // Reset flag
+          // Reject all queued requests because refresh is impossible
+          failedRequestsQueue.forEach((prom) => prom.reject(response.clone())); // Clone response
+          failedRequestsQueue = [];
 
-            // Redirect to login if refresh token is invalid
-            if (typeof window !== 'undefined') {
-              console.log('Redirecting to login page due to invalid refresh token.');
-              window.location.href = '/login';
-            }
-            return response; // Return the original 401 response for the refresh call
+          // Redirect to login if refresh token is invalid
+          if (typeof window !== "undefined") {
+            console.log(
+              "Redirecting to login page due to invalid refresh token.",
+            );
+            window.location.href = "/login";
+          }
+          return response; // Return the original 401 response for the refresh call
         }
         return response; // For non-401 responses
       },
@@ -139,7 +157,7 @@ const kyInstance = ky.create({
 
 // New instance for Go backend (remains unchanged)
 export const goKyInstance = ky.create({
-  prefixUrl: "http://localhost:8083",
+  prefixUrl: process.env.NEXT_PUBLIC_GO_BACKEND_URL || "http://localhost:8083",
   credentials: "include",
   parseJson: (text) => {
     if (!text || text.trim() === "") return null;
