@@ -16,14 +16,20 @@ export async function logout() {
   cookieStore.set("access_token", "", {
     path: "/",
     maxAge: 0,
+    domain: ".go-together-uom.vercel.app",
+    secure: true,
   });
   cookieStore.set("user", "", {
     path: "/",
     maxAge: 0,
+    domain: ".go-together-uom.vercel.app",
+    secure: true,
   });
   cookieStore.set("refresh_token", "", {
     path: "/api/auth/refresh",
     maxAge: 0,
+    domain: ".go-together-uom.vercel.app",
+    secure: true,
   });
 
   // Prepare Keycloak logout URL
