@@ -7,41 +7,29 @@ export async function logout() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
-  // If no token, redirect to login
   if (!accessToken) {
     return redirect("/login");
   }
 
-  // Clear cookies
-  cookieStore.set("access_token", "", {
+  // Properly clear cookies
+  const cookieOptions = {
     path: "/",
     maxAge: 0,
-    domain: ".go-together-uom.vercel.app",
     secure: true,
-  });
-  cookieStore.set("user", "", {
-    path: "/",
-    maxAge: 0,
-    domain: ".go-together-uom.vercel.app",
-    secure: true,
-  });
-  cookieStore.set("refresh_token", "", {
-    path: "/api/auth/refresh",
-    maxAge: 0,
-    domain: ".go-together-uom.vercel.app",
-    secure: true,
-  });
+    domain: ".go-together-uom.vercel.app", // or remove this if same-site cookies
+  };
 
-  // Prepare Keycloak logout URL
-  const logoutUrl =
-    process.env.NEXT_PUBLIC_KEYCLOAK_LOGOUT_URL ||
-    "http://localhost:8084/realms/kong/protocol/openid-connect/logout";
-  const redirectUri =
-    process.env.NEXT_PUBLIC_KEYCLOAK_REDIRECT_URI ||
-    "http://localhost:3000/login";
+  cookieStore.set("access_token", "", cookieOptions);
+  cookieStore.set("refresh_token", "", {
+    ...cookieOptions,
+    path: "/api/auth/refresh",
+  });
+  cookieStore.set("user", "", cookieOptions);
+
+  const logoutUrl = process.env.NEXT_PUBLIC_KEYCLOAK_LOGOUT_URL!;
+  const redirectUri = process.env.NEXT_PUBLIC_KEYCLOAK_REDIRECT_URI!;
 
   const fullLogoutUrl = `${logoutUrl}?client_id=kong-oidc&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
 
-  // Perform redirect
   return redirect(fullLogoutUrl);
 }
