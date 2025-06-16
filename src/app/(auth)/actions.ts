@@ -7,8 +7,8 @@ export function logout() {
 
   // Redirect to Keycloak logout endpoint
   const logoutUrl = process.env.NEXT_PUBLIC_KEYCLOAK_LOGOUT_URL!;
-  const redirectUri = process.env.NEXT_PUBLIC_KEYCLOAK_REDIRECT_URI!;
-  const fullLogoutUrl = `${logoutUrl}?client_id=kong-oidc&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+  const redirectUri = process.env.NEXT_PUBLIC_KEYCLOAK_REDIRECT_URI!.trim();
 
+  const fullLogoutUrl = `${logoutUrl}?client_id=kong-oidc&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
   window.location.href = fullLogoutUrl;
 }
