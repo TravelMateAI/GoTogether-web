@@ -46,7 +46,7 @@ export async function login(
 
   cookieStore.set("access_token", accessToken, {
     path: "/",
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     maxAge: 3600, // Or use expiresIn from backend response if available and preferred
   });
