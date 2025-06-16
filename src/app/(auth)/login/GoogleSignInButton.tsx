@@ -10,7 +10,7 @@ export default function GoogleSignInButton() {
       <a
         href={
           process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL ||
-          "http://localhost:8080/oauth2/authorization/google"
+          "https://gotogetheruom.duckdns.org/oauth2/authorization/keycloak"
         }
         className="flex w-full items-center gap-2"
       >
