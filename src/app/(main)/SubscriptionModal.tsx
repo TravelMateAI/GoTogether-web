@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { CheckCircle2, Zap, ShieldCheck, UserCheck } from "lucide-react";
 
 export default function SubscriptionModal() {
   const [open, setOpen] = useState(false);
@@ -28,20 +29,20 @@ export default function SubscriptionModal() {
       name: "Free",
       price: "$0/mo",
       features: [
-        "Access to basic features",
-        "Limited support",
-        "Community access",
+        { label: "Access to basic features", icon: CheckCircle2 },
+        { label: "Limited support", icon: UserCheck },
+        { label: "Community access", icon: ShieldCheck },
       ],
-      cta: "Subscribe",
+      cta: "Start Free",
       popular: false,
     },
     {
       name: "Pro",
       price: "$10/mo",
       features: [
-        "Access to Pro features",
-        "Priority email support",
-        "Advanced analytics",
+        { label: "Access to Pro features", icon: Zap },
+        { label: "Priority email support", icon: ShieldCheck },
+        { label: "Advanced analytics", icon: CheckCircle2 },
       ],
       cta: "Get Pro",
       popular: true,
@@ -50,11 +51,11 @@ export default function SubscriptionModal() {
       name: "Plus",
       price: "$25/mo",
       features: [
-        "Access to all features",
-        "24/7 phone support",
-        "Dedicated account manager",
+        { label: "All features unlocked", icon: Zap },
+        { label: "24/7 phone support", icon: ShieldCheck },
+        { label: "Dedicated account manager", icon: UserCheck },
       ],
-      cta: "Get Plus",
+      cta: "Go Plus",
       popular: false,
     },
   ];
@@ -62,56 +63,66 @@ export default function SubscriptionModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">View Subscription Plans</Button>
+        <Button
+          variant="outline"
+          className="font-semibold"
+          aria-label="Open subscription plans"
+        >
+          Plans
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-6xl p-6 sm:p-8">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl">
-            Choose Your Plan
+          <DialogTitle className="text-center text-3xl font-extrabold text-primary">
+            Choose the Right Plan for You
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col items-stretch justify-center gap-6 md:flex-row">
+        <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:justify-center">
           {plans.map((plan) => (
             <Card
               key={plan.name}
               className={cn(
-                "flex w-full flex-col shadow-lg transition-shadow duration-300 hover:shadow-xl md:max-w-sm",
-                plan.popular
-                  ? "transform border-2 border-primary md:scale-105"
-                  : "border",
+                "relative flex w-full flex-col justify-between border shadow-lg transition-transform hover:scale-[1.03] sm:w-72",
+                plan.popular && "border-primary ring-2 ring-primary",
               )}
             >
-              <CardHeader
-                className={cn("p-6 text-center", plan.popular && "relative")}
-              >
+              <CardHeader className="p-6 text-center">
                 {plan.popular && (
-                  <Badge className="absolute right-0 top-0 -mr-3 -mt-3">
-                    Popular
+                  <Badge
+                    className="absolute right-4 top-4 animate-pulse"
+                    variant="outline"
+                  >
+                    ⭐ Best Value
                   </Badge>
                 )}
-                <CardTitle className="text-2xl font-semibold">
+                <CardTitle className="text-2xl font-bold">
                   {plan.name}
                 </CardTitle>
-                <CardDescription className="text-xl font-medium">
+                <CardDescription className="mt-1 text-lg text-muted-foreground">
                   {plan.price}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow p-6">
-                <ul className="list-inside list-disc space-y-2 text-sm">
-                  {plan.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
+              <CardContent className="p-6">
+                <ul className="space-y-4 text-left text-sm">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <feature.icon className="h-5 w-5 text-green-600" />
+                      <span>{feature.label}</span>
+                    </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter className="p-6">
                 <Button
                   className={cn(
-                    "w-full font-semibold",
-                    plan.popular ? "bg-primary hover:bg-primary/90" : "",
+                    "w-full",
+                    plan.popular
+                      ? "bg-primary text-white hover:bg-primary/90"
+                      : "",
                   )}
                   onClick={() => {
                     setOpen(false);
-                    // handleSubscribe(plan.name); // Add logic if needed
+                    // handleSubscribe(plan.name);
                   }}
                 >
                   {plan.cta}
@@ -120,6 +131,9 @@ export default function SubscriptionModal() {
             </Card>
           ))}
         </div>
+        <p className="mx-auto mt-6 max-w-xl text-center text-sm text-muted-foreground">
+          You can switch or cancel your plan anytime from your account settings.
+        </p>
       </DialogContent>
     </Dialog>
   );
