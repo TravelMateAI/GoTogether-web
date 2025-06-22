@@ -157,7 +157,24 @@ const kyInstance = ky.create({
 
 // New instance for Go backend (remains unchanged)
 export const goKyInstance = ky.create({
-  prefixUrl: process.env.NEXT_PUBLIC_GO_BACKEND_URL || "http://localhost:8083",
+  prefixUrl: process.env.NEXT_PUBLIC_GO_BACKEND_URL || "http://localhost:8080",
+  credentials: "include",
+  parseJson: (text) => {
+    if (!text || text.trim() === "") return null;
+    return JSON.parse(text, (key, value) =>
+      key.endsWith("At") && typeof value === "string" ? new Date(value) : value,
+    );
+  },
+  timeout: 30000,
+  retry: {
+    limit: 3,
+    methods: ["get", "post"],
+  },
+});
+
+// New instance for Go backend (remains unchanged)
+export const planningKyInstance = ky.create({
+  prefixUrl: process.env.NEXT_PUBLIC_PLANNING_BACKEND_URL || "http://localhost:8081",
   credentials: "include",
   parseJson: (text) => {
     if (!text || text.trim() === "") return null;
