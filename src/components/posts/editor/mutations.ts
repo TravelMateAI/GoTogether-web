@@ -37,13 +37,18 @@ export function useSubmitPostMutation() {
   return mutation;
 }
 
-
 export function useUpdatePostMutation() {
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: async ({ postId, caption }: { postId: string; caption: string }) => {
-      return updatePost({ postId, caption});
+    mutationFn: async ({
+      postId,
+      caption,
+    }: {
+      postId: string;
+      caption: string;
+    }) => {
+      return updatePost({ postId, caption });
     },
     onSuccess: () => {
       toast({ description: "Post updated successfully!" });

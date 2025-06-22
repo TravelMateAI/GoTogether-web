@@ -25,40 +25,32 @@ export default function SubscriptionModal() {
   const [open, setOpen] = useState(false);
 
   const plans = [
-    {
-      name: "Free",
-      price: "$0/mo",
-      features: [
-        { label: "Access to basic features", icon: CheckCircle2 },
-        { label: "Limited support", icon: UserCheck },
-        { label: "Community access", icon: ShieldCheck },
-      ],
-      cta: "Start Free",
-      popular: false,
-    },
-    {
-      name: "Pro",
-      price: "$10/mo",
-      features: [
-        { label: "Access to Pro features", icon: Zap },
-        { label: "Priority email support", icon: ShieldCheck },
-        { label: "Advanced analytics", icon: CheckCircle2 },
-      ],
-      cta: "Get Pro",
-      popular: true,
-    },
-    {
-      name: "Plus",
-      price: "$25/mo",
-      features: [
-        { label: "All features unlocked", icon: Zap },
-        { label: "24/7 phone support", icon: ShieldCheck },
-        { label: "Dedicated account manager", icon: UserCheck },
-      ],
-      cta: "Go Plus",
-      popular: false,
-    },
-  ];
+  {
+    name: "Free",
+    price: "$0 USD/month",
+    features: [
+      { label: "Unlimited trip planning", icon: CheckCircle2 },
+      { label: "Up to 5 participants per trip", icon: UserCheck },
+      { label: "Shows ads", icon: ShieldCheck },
+      { label: "Gemini recommendation model", icon: Zap },
+    ],
+    cta: "Start Free",
+    popular: false,
+  },
+  {
+    name: "PRO",
+    price: "$2.99 USD/month",
+    features: [
+      { label: "Unlimited + personalized planning", icon: CheckCircle2 },
+      { label: "Unlimited participants", icon: UserCheck },
+      { label: "100% ad-free experience", icon: ShieldCheck },
+      { label: "Chat-GPT 4o recommendation model", icon: Zap },
+    ],
+    cta: "Get Pro",
+    popular: true,
+  },
+];
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
